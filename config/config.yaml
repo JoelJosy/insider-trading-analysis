@@ -1,0 +1,102 @@
+# Insider Trading Analysis - Configuration File
+# =============================================
+
+# Database Configuration
+database:
+  host: localhost
+  port: 5432
+  name: insider_trading_db
+  user: postgres
+  password: supa
+  pool_size: 5
+  max_overflow: 10
+
+# SEC EDGAR Configuration
+sec_edgar:
+  base_url: "https://www.sec.gov"
+  rate_limit_per_second: 10
+  user_agent: "InsiderTradingAnalysis/1.0 (Research Project)"
+  form_types:
+    - "4"
+    - "4/A"  # Amendments
+  date_range:
+    start: "2020-01-01"
+    end: "2024-12-31"
+  
+# Data Paths
+paths:
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  external_data: "data/external"
+  models: "models"
+  logs: "logs"
+  reports: "reports"
+
+# Feature Engineering
+features:
+  temporal:
+    window_size: 10  # Number of past trades to consider
+    max_days_lookback: 365
+  network:
+    coordination_window_hours: 72
+    monthly_snapshot: true
+  nlp:
+    min_footnote_length: 10
+    sentiment_model: "finbert"  # or "textblob"
+  
+# Model Hyperparameters
+models:
+  random_seed: 42
+  test_size: 0.2
+  validation_size: 0.15
+  
+  lstm:
+    hidden_size: 64
+    num_layers: 2
+    dropout: 0.3
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 100
+    early_stopping_patience: 10
+    
+  random_forest:
+    n_estimators: 200
+    max_depth: 15
+    min_samples_split: 5
+    min_samples_leaf: 2
+    
+  gnn:
+    hidden_channels: 64
+    num_layers: 3
+    dropout: 0.3
+    learning_rate: 0.001
+
+# Labeling Configuration
+labeling:
+  abnormal_return_threshold: 0.15  # 15% abnormal return
+  earnings_proximity_days: 30
+  confidence_sources_required: 2
+  
+# Logging Configuration
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/insider_trading.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# S&P 100 Tickers (subset for initial testing)
+tickers:
+  proof_of_concept:
+    - AAPL
+  sp100_sample:
+    - AAPL
+    - MSFT
+    - GOOGL
+    - AMZN
+    - META
+    - NVDA
+    - TSLA
+    - JPM
+    - JNJ
+    - V
