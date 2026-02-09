@@ -4,15 +4,19 @@
 
 Pattern Recognition Project | Data Warehousing Course
 
+---
+
 ## 🎯 Project Overview
 
 This research project implements an **Explainable Anomaly Detection** system for insider trading patterns using multi-source validation. The system combines:
 
-- **Temporal Sequence Modeling** (LSTM) on insider trading history
-- **Network Coordination Features** (graph analysis of multiple insiders)  
-- **Explainability Layer** (SHAP values for each prediction)
-- **Multi-source Validation** (SEC enforcement + earnings surprises + stock returns)
-- **Ablation Study** (which features/methods contribute most)
+- Temporal Sequence Modeling (LSTM) on insider trading history
+- Network Coordination Features (graph analysis of multiple insiders)
+- Explainability Layer (SHAP values for each prediction)
+- Multi-source Validation (SEC enforcement + earnings surprises + stock returns)
+- Ablation Study (which features/methods contribute most)
+
+---
 
 ## 🏗️ Project Structure
 
@@ -42,82 +46,147 @@ insider-trading-analysis/
 ├── notebooks/                # Jupyter notebooks
 ├── reports/                  # Data quality reports
 ├── .env                      # Environment variables
-├── requirements.txt          # Python dependencies
+├── requirements.txt          # Base dependencies
+├── requirements-lock.txt     # Exact dependency versions (generated via pip freeze)
 └── README.md
 ```
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Python 3.10+
+- Python **3.11 or 3.12 (recommended)**
+  > Python 3.13 is not recommended as some ML libraries (Torch, SciPy, etc.) may not be fully supported.
 - PostgreSQL 14+ (running on localhost:5432)
 - Git
 
-### Installation
+---
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repo-url>
-   cd insider-trading-analysis
-   ```
+## Installation
 
-2. **Create a virtual environment:**
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate  # Windows
-   # source venv/bin/activate  # Linux/Mac
-   ```
+### 1. Clone the repository
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+git clone <repo-url>
+cd insider-trading-analysis
+```
 
-4. **Configure environment:**
-   - Copy `.env` and update with your PostgreSQL credentials
-   - Review `config/config.yaml` for other settings
+---
 
-5. **Initialize database:**
-   ```bash
-   python -m src.data.load --init-schema
-   ```
+### 2. Create a virtual environment
 
-### Download and Parse SEC Filings
+**Mac/Linux**
 
-**Proof of Concept (Apple only):**
+```bash
+python3.11 -m venv venv
+source venv/bin/activate
+```
+
+**Windows**
+
+```bash
+py -3.11 -m venv venv
+venv\Scripts\activate
+```
+
+---
+
+### 3. Install dependencies
+
+For exact reproducibility across machines:
+
+```bash
+pip install --upgrade pip
+pip install -r requirements-lock.txt
+```
+
+If you only need base dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 4. Configure environment
+
+- Copy `.env` and update with your PostgreSQL credentials
+- Review `config/config.yaml` for additional settings
+
+---
+
+### 5. Initialize database
+
+```bash
+python -m src.data.load --init-schema
+```
+
+---
+
+## 📦 Dependency Management (Team Workflow)
+
+After installing or adding new libraries:
+
+```bash
+pip freeze > requirements-lock.txt
+```
+
+Commit this file so all collaborators use **identical package versions**.
+
+**Team recommendations**
+
+- Python: 3.11 (preferred) or 3.12
+- Avoid Python 3.13 unless all libraries support it
+
+---
+
+## 📥 Download and Parse SEC Filings
+
+### Proof of Concept (Apple only)
+
 ```bash
 python -m src.data.extract --ticker AAPL --num-filings 100
 ```
 
-**Load to database:**
+### Load to database
+
 ```bash
 python -m src.data.load --load-csv data/processed/AAPL_form4.csv
 ```
 
-**Generate quality report:**
+### Generate quality report
+
 ```bash
 python -m src.data.quality --csv data/processed/AAPL_form4.csv --report
 ```
+
+---
 
 ## 📊 Database Schema
 
 The system uses a PostgreSQL star schema with:
 
-**Fact Tables:**
-- `fact_insider_trades` - Main transaction fact table (partitioned by year)
-- `fact_daily_summary` - Aggregated daily insider activity
+### Fact Tables
 
-**Dimension Tables:**
-- `dim_time` - Date attributes
-- `dim_company` - Company information
-- `dim_insider` - Insider details
-- `dim_transaction_type` - Transaction code lookup
+- `fact_insider_trades` – Main transaction fact table (partitioned by year)
+- `fact_daily_summary` – Aggregated daily insider activity
 
-**Supplementary:**
-- `stock_prices` - Daily OHLCV data
-- `earnings_announcements` - Earnings surprises
-- `sec_enforcement` - SEC litigation cases
+### Dimension Tables
+
+- `dim_time` – Date attributes
+- `dim_company` – Company information
+- `dim_insider` – Insider details
+- `dim_transaction_type` – Transaction code lookup
+
+### Supplementary Tables
+
+- `stock_prices` – Daily OHLCV data
+- `earnings_announcements` – Earnings surprises
+- `sec_enforcement` – SEC litigation cases
+
+---
 
 ## 🧪 Running Tests
 
@@ -125,15 +194,19 @@ The system uses a PostgreSQL star schema with:
 pytest tests/ -v
 ```
 
+---
+
 ## 📈 Development Phases
 
-- [x] **Phase 1:** Data Infrastructure (ETL, Database)
-- [ ] **Phase 2:** Feature Engineering
-- [ ] **Phase 3:** Labeling & Ground Truth
-- [ ] **Phase 4:** Model Development
-- [ ] **Phase 5:** Validation & Evaluation
-- [ ] **Phase 6:** Dashboard & Demo
-- [ ] **Phase 7:** Research Paper
+- [x] Phase 1: Data Infrastructure (ETL, Database)
+- [ ] Phase 2: Feature Engineering
+- [ ] Phase 3: Labeling & Ground Truth
+- [ ] Phase 4: Model Development
+- [ ] Phase 5: Validation & Evaluation
+- [ ] Phase 6: Dashboard & Demo
+- [ ] Phase 7: Research Paper
+
+---
 
 ## 📝 Configuration
 
@@ -144,7 +217,7 @@ database:
   host: localhost
   port: 5432
   name: insider_trading_db
-  password: supa  # Update via .env
+  password: supa # Update via .env
 
 sec_edgar:
   rate_limit_per_second: 10
@@ -159,9 +232,13 @@ models:
     dropout: 0.3
 ```
 
+---
+
 ## 📄 License
 
 This project is for academic research purposes.
+
+---
 
 ## 🙏 Acknowledgments
 
