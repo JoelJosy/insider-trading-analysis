@@ -205,6 +205,9 @@ CREATE TABLE IF NOT EXISTS fact_insider_trades (
 ) PARTITION BY RANGE (filing_date);
 
 -- Create partitions by year
+CREATE TABLE IF NOT EXISTS fact_insider_trades_2019 PARTITION OF fact_insider_trades
+    FOR VALUES FROM ('2019-01-01') TO ('2020-01-01');
+
 CREATE TABLE IF NOT EXISTS fact_insider_trades_2020 PARTITION OF fact_insider_trades
     FOR VALUES FROM ('2020-01-01') TO ('2021-01-01');
 
@@ -222,6 +225,9 @@ CREATE TABLE IF NOT EXISTS fact_insider_trades_2024 PARTITION OF fact_insider_tr
 
 CREATE TABLE IF NOT EXISTS fact_insider_trades_2025 PARTITION OF fact_insider_trades
     FOR VALUES FROM ('2025-01-01') TO ('2026-01-01');
+
+CREATE TABLE IF NOT EXISTS fact_insider_trades_2026 PARTITION OF fact_insider_trades
+    FOR VALUES FROM ('2026-01-01') TO ('2027-01-01');
 
 -- Indexes on fact table
 CREATE INDEX IF NOT EXISTS idx_fact_trades_insider ON fact_insider_trades(insider_key);
