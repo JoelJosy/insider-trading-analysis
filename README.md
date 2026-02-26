@@ -152,8 +152,13 @@ Step 4 — LOAD (load.py --load-csv)
   Updates dim_insider aggregate statistics
       │
       ▼
-Step 5 — (Future) FEATURES / MODELS
-  Feature engineering, labeling, ML training
+Step 5 — FEATURES (src/features/pipeline.py)
+  Deduplicates, runs 5 feature modules (trade, insider, temporal, network, text)
+  Writes data/processed/<TICKER>_form4_features.csv (47 feature columns)
+      │
+      ▼
+Step 6 — (Future) LABELING / MODELS
+  Labeling, ML training, SHAP explainability
 ```
 
 ---
@@ -259,6 +264,28 @@ python -m src.data.load --load-csv data/processed/AAPL_form4.csv
 
 ---
 
+### Step 5 — Feature Engineering
+
+```bash
+python -m src.features.pipeline --input data/processed/AAPL_form4.csv
+```
+
+**What it does:**
+
+- Deduplicates the processed CSV
+- Runs 5 feature modules: trade → insider → temporal → network → text
+- Writes `data/processed/AAPL_form4_features.csv` (724 rows × 47 feature columns)
+
+**Add `--full` to keep all 80+ columns instead of just the feature matrix.**
+
+**What it updates:**
+| Location | Detail |
+|---|---|
+| `data/processed/AAPL_form4_features.csv` | Feature matrix |
+| `logs/features.log` | Execution log |
+
+---
+
 ### Optional standalone commands
 
 ```bash
@@ -335,7 +362,7 @@ pytest tests/ -v
 ## 📈 Development Phases
 
 - [x] Phase 1: Data Infrastructure (ETL, Database)
-- [ ] Phase 2: Feature Engineering
+- [x] Phase 2: Feature Engineering
 - [ ] Phase 3: Labeling & Ground Truth
 - [ ] Phase 4: Model Development
 - [ ] Phase 5: Validation & Evaluation

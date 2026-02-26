@@ -53,28 +53,35 @@ class PathsConfig:
 
 
 @dataclass
+class TradeFeaturesConfig:
+    log_transform_cols: list = field(default_factory=lambda: ["shares", "total_value", "shares_owned_after"])
+    value_bucket_bins: list = field(default_factory=lambda: [0, 100000, 500000, 2000000, 10000000])
+
+
+@dataclass
 class TemporalFeaturesConfig:
-    window_size: int = 10
+    rolling_windows_days: list = field(default_factory=lambda: [7, 30, 90])
     max_days_lookback: int = 365
 
 
 @dataclass
 class NetworkFeaturesConfig:
     coordination_window_hours: int = 72
-    monthly_snapshot: bool = True
 
 
 @dataclass
-class NLPFeaturesConfig:
+class TextFeaturesConfig:
     min_footnote_length: int = 10
-    sentiment_model: str = "textblob"
+    sentiment_model: str = "rule_based"
 
 
 @dataclass
 class FeaturesConfig:
+    output_dir: str = "data/processed"
+    trade: TradeFeaturesConfig = field(default_factory=TradeFeaturesConfig)
     temporal: TemporalFeaturesConfig = field(default_factory=TemporalFeaturesConfig)
     network: NetworkFeaturesConfig = field(default_factory=NetworkFeaturesConfig)
-    nlp: NLPFeaturesConfig = field(default_factory=NLPFeaturesConfig)
+    text: TextFeaturesConfig = field(default_factory=TextFeaturesConfig)
 
 
 @dataclass
@@ -174,9 +181,11 @@ class Config:
             cfg.paths = PathsConfig(**paths)
         if feat := data.get("features"):
             cfg.features = FeaturesConfig(
+                output_dir=feat.get("output_dir", "data/processed"),
+                trade=TradeFeaturesConfig(**feat.get("trade", {})),
                 temporal=TemporalFeaturesConfig(**feat.get("temporal", {})),
                 network=NetworkFeaturesConfig(**feat.get("network", {})),
-                nlp=NLPFeaturesConfig(**feat.get("nlp", {})),
+                text=TextFeaturesConfig(**feat.get("text", {})),
             )
         if mdls := data.get("models"):
             cfg.models = ModelsConfig(

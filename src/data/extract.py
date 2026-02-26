@@ -150,7 +150,9 @@ class Form4XMLParser:
 
         return Form4Filing(
             accession_number=self._accession_number(xml_path),
-            filing_date=self._parse_date(self._v(ns, root, "periodOfReport")) or date.today(),
+            filing_date=self._parse_date(self._v(ns, root, "ownerSignature", "signatureDate"))
+                        or self._parse_date(self._v(ns, root, "periodOfReport"))
+                        or date.today(),
             issuer_cik=self._v(ns, issuer, "issuerCik"),
             issuer_name=self._v(ns, issuer, "issuerName"),
             issuer_ticker=self._v(ns, issuer, "issuerTradingSymbol"),
@@ -333,7 +335,10 @@ def _filing_to_records(filing: Form4Filing) -> List[dict]:
                         "shares_owned_after": t.shares_owned_after, "direct_indirect": t.direct_indirect,
                         "is_open_market": t.is_open_market, "is_derivative": False})
     for t in filing.derivative_transactions:
-        tv = t.shares * t.price_per_share if t.shares and t.price_per_share else None
+        # For exercise/conversion (M code), price_per_share is often 0 or null;
+        # use conversion_price as the cost basis instead.
+        deriv_price = t.price_per_share or t.conversion_price
+        tv = t.shares * deriv_price if t.shares and deriv_price else None
         records.append({**base, "security_title": t.security_title, "transaction_date": t.transaction_date,
                         "transaction_code": t.transaction_code, "shares": t.shares, "price_per_share": t.price_per_share,
                         "total_value": tv, "acquired_disposed": None, "shares_owned_after": t.shares_owned_after,

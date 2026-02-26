@@ -34,15 +34,22 @@ paths:
 
 # Feature Engineering
 features:
+  output_dir: "data/processed" # feature CSVs written here
+
+  trade:
+    log_transform_cols: ["shares", "total_value", "shares_owned_after"]
+    value_bucket_bins: [0, 100000, 500000, 2000000, 10000000]
+
   temporal:
-    window_size: 10 # Number of past trades to consider
+    rolling_windows_days: [7, 30, 90]
     max_days_lookback: 365
+
   network:
     coordination_window_hours: 72
-    monthly_snapshot: true
-  nlp:
+
+  text:
     min_footnote_length: 10
-    sentiment_model: "finbert" # or "textblob"
+    sentiment_model: "rule_based" # swap to "finbert" in Phase 4
 
 # Model Hyperparameters
 models:
