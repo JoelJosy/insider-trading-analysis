@@ -8,7 +8,7 @@ lxml==4.9.4
 beautifulsoup4==4.12.2
 
 # Market Data
-yfinance==0.2.33
+yfinance>=0.2.54
 
 # Machine Learning
 scikit-learn==1.3.2

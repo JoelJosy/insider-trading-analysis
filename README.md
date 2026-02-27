@@ -34,6 +34,7 @@ insider-trading-analysis/
 │   │   ├── load.py           # Database loader
 │   │   └── quality.py        # Data quality checks
 │   ├── features/             # Feature engineering (coming soon)
+│   ├── labels/               # Phase 3 labeling pipeline
 │   ├── models/               # ML models (coming soon)
 │   ├── evaluation/           # Metrics & explainability (coming soon)
 │   └── utils/
@@ -122,7 +123,7 @@ Review `config/config.yaml` for rate limits, date ranges, and model hyperparamet
 
 ## 🔁 Pipeline — How It Works
 
-The pipeline has **5 sequential steps**. Steps 1–2 run entirely on disk (no database needed). Steps 3–5 require PostgreSQL.
+The pipeline has **6 sequential steps**. Steps 1–2 and Step 6 run entirely on disk (no database needed). Steps 3–5 require PostgreSQL.
 
 ```
 [SEC EDGAR API]
@@ -157,8 +158,13 @@ Step 5 — FEATURES (src/features/pipeline.py)
   Writes data/processed/<TICKER>_form4_features.csv (47 feature columns)
       │
       ▼
-Step 6 — (Future) LABELING / MODELS
-  Labeling, ML training, SHAP explainability
+Step 6 — LABELING (src/labels/pipeline.py)
+  Builds ground-truth labels (routine vs informed)
+  using abnormal returns + optional earnings/enforcement confirmations
+      │
+      ▼
+Step 7 — (Future) MODELS
+  ML training, SHAP explainability
 ```
 
 ---
@@ -178,6 +184,8 @@ python -m src.data.extract --ticker AAPL --num-filings 500
 - Fetches up to 100 Form 4 filings for AAPL from SEC EDGAR (respects the 10 req/s rate limit)
 - Saves raw XML files under `data/raw/sec-edgar-filings/AAPL/4/<accession>/`
 - Parses all XML files into a flat table of transactions
+- Fetches daily close prices from Yahoo Finance (Phase 3 prep)
+- Back-fills `total_value` for `M`-code rows when SEC price is missing: `shares * close_price_on_txn_date`
 - Writes `data/processed/AAPL_form4.csv` (~294 rows for 100 filings)
 
 **What it updates:**
@@ -185,7 +193,14 @@ python -m src.data.extract --ticker AAPL --num-filings 500
 |---|---|
 | `data/raw/sec-edgar-filings/` | Raw `.txt` XML filing bundles downloaded from SEC |
 | `data/processed/AAPL_form4.csv` | Parsed transactions (one row per transaction, not per filing) |
+| `data/external/prices/` | Cached daily close prices downloaded via `yfinance` |
 | `logs/extract.log`, `logs/parser.log`, `logs/downloader.log` | Execution logs |
+
+To skip market-price enrichment (offline or faster parsing):
+
+```bash
+python -m src.data.extract --ticker AAPL --num-filings 500 --skip-market-prices
+```
 
 ---
 
@@ -286,6 +301,99 @@ python -m src.features.pipeline --input data/processed/AAPL_form4.csv
 
 ---
 
+### Step 6 — Labeling & Ground Truth (Phase 3)
+
+```bash
+python -m src.labels.pipeline --input data/processed/AAPL_form4_features.csv
+```
+
+**What it does:**
+
+- Loads your features (or processed) CSV with `ticker` + `transaction_date`
+- Fetches horizon forward prices and computes directional abnormal return vs `SPY`
+- Creates `price_signal` using threshold from `config.labeling.abnormal_return_threshold`
+- Optionally adds confirmations from:
+  - `data/external/earnings/earnings_announcements.csv` (`ticker`, `announcement_date`)
+  - `data/external/sec/sec_enforcement.csv` (`ticker`, `action_date`)
+- Combines signal count into final labels:
+  - `informed_label` / `routine_label`
+  - `label_name`, `label_confidence`, `label_source_count`
+- Fails fast if benchmark/ticker market prices are unavailable (prevents silent all-routine labels)
+- Generates Phase 3 label quality report (JSON + Markdown)
+
+**What it updates:**
+| Location | Detail |
+|---|---|
+| `data/processed/*_labeled.csv` | Final Phase 3 labeled dataset |
+| `logs/labels.log` | Labeling execution log |
+| `reports/*_label_quality_report.json` | Label-quality metrics (coverage, signal counts, recommendations) |
+| `reports/*_label_quality_report.md` | Human-readable label quality summary |
+
+**Useful options:**
+
+```bash
+python -m src.labels.pipeline \
+  --input data/processed/AAPL_form4_features.csv \
+  --output data/processed/AAPL_form4_labeled.csv \
+  --horizon-days 30 \
+  --benchmark SPY
+```
+
+If you must continue without market prices (debug only):
+
+```bash
+python -m src.labels.pipeline --input data/processed/AAPL_form4_features.csv --allow-missing-prices
+```
+
+If Yahoo fetch fails repeatedly, upgrade `yfinance` in your environment:
+
+```bash
+pip install --upgrade yfinance
+```
+
+### Step 6.1 — Calibration Sweep (recommended)
+
+```bash
+python -m src.labels.calibrate --input data/processed/AAPL_form4_features.csv
+```
+
+**What it does:**
+
+- Sweeps multiple `abnormal_threshold` and `confidence_sources_required` combinations
+- Measures informed-label percentage under each combo
+- Recommends settings closest to a target informed-label range
+
+**What it updates:**
+| Location | Detail |
+|---|---|
+| `reports/*_label_calibration_grid.csv` | Full threshold/confidence sweep table |
+| `reports/*_label_calibration_summary.json` | Machine-readable recommended settings |
+| `reports/*_label_calibration_summary.md` | Human-readable calibration summary |
+
+### Step 6.2 — Build External Confirmation Data (earnings + SEC enforcement)
+
+```bash
+python -m src.data.external_events --tickers AAPL
+```
+
+**What it does:**
+
+- Fetches historical earnings announcement dates via `yfinance`
+- Fetches SEC litigation RSS releases and maps rows to your tickers (when ticker is mentioned)
+- Applies richer enforcement matching using ticker + company-name aliases
+- Appends + deduplicates records in external CSVs
+
+**What it updates:**
+| Location | Detail |
+|---|---|
+| `data/external/earnings/earnings_announcements.csv` | `ticker,announcement_date` rows |
+| `data/external/sec/sec_enforcement.csv` | `ticker,action_date,source_title,source_link,matched_by` rows |
+| `logs/external_events.log` | Ingestion execution log |
+
+Optional: add custom aliases in `data/external/sec/company_aliases.csv` with columns `ticker,alias`.
+
+---
+
 ### Optional standalone commands
 
 ```bash
@@ -363,7 +471,7 @@ pytest tests/ -v
 
 - [x] Phase 1: Data Infrastructure (ETL, Database)
 - [x] Phase 2: Feature Engineering
-- [ ] Phase 3: Labeling & Ground Truth
+- [x] Phase 3: Labeling & Ground Truth
 - [ ] Phase 4: Model Development
 - [ ] Phase 5: Validation & Evaluation
 - [ ] Phase 6: Dashboard & Demo

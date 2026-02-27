@@ -80,9 +80,9 @@ models:
 
 # Labeling Configuration
 labeling:
-  abnormal_return_threshold: 0.15 # 15% abnormal return
+  abnormal_return_threshold: 0.05 # calibrated on current AAPL dataset
   earnings_proximity_days: 30
-  confidence_sources_required: 2
+  confidence_sources_required: 2 # final Phase 3 multi-source default
 
 # Logging Configuration
 logging:

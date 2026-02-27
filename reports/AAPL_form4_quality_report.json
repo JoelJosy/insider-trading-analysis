@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-02-26T13:45:23.272124",
+  "generated_at": "2026-02-26T20:56:43.639284",
   "source_file": "data/processed/AAPL_form4.csv",
   "total_rows": 750,
   "total_columns": 31,
@@ -29,12 +29,12 @@
         "0000320193-20-000039": 13,
         "0000320193-20-000066": 11,
         "0000320193-20-000041": 10,
-        "0002050912-25-000008": 9,
-        "0000320193-25-000042": 9,
-        "0000320193-25-000043": 9,
         "0000320193-20-000045": 9,
+        "0002050912-25-000008": 9,
         "0000320193-22-000095": 9,
-        "0000320193-23-000088": 8,
+        "0000320193-25-000043": 9,
+        "0000320193-25-000042": 9,
+        "0000320193-23-000047": 8,
         "0000320193-24-000110": 8
       }
     },
@@ -149,8 +149,8 @@
         "COOK TIMOTHY D": 72,
         "LEVINSON ARTHUR D": 32,
         "JUNG ANDREA": 23,
-        "SUGAR RONALD D": 20,
-        "WAGNER SUSAN": 20
+        "WAGNER SUSAN": 20,
+        "SUGAR RONALD D": 20
       }
     },
     {
@@ -167,7 +167,7 @@
       "median": 1496686.0,
       "q75": 1631982.0,
       "max": 2078476.0,
-      "skewness": 0.1287619002392519,
+      "skewness": 0.12876190023925183,
       "kurtosis": -0.26559568634047137,
       "outlier_count": 0,
       "outlier_pct": 0.0,
@@ -338,14 +338,14 @@
       "top_values": {
         "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of restricted stock units in shares of common stock on their scheduled vesting date. This restricted stock unit award was granted on March 10, 2023 and vested entirely on February 1, 2024.": 16,
         "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of restricted stock units in shares of common stock on their scheduled vesting date. This restricted stock unit award was granted on March 4, 2022 and vested entirely on February 1, 2023.": 15,
-        "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of restricted stock units in shares of common stock on their scheduled vesting date. This restricted stock unit award was granted on February 23, 2021 and vested entirely on February 1, 2022.": 15,
         "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of restricted stock units in shares of common stock on their scheduled vesting date. This restricted stock unit award was granted on February 28, 2024 and vested entirely on February 1, 2025.": 15,
+        "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of restricted stock units in shares of common stock on their scheduled vesting date. This restricted stock unit award was granted on February 23, 2021 and vested entirely on February 1, 2022.": 15,
         "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of restricted stock units in shares of common stock on their scheduled vesting date. This restricted stock unit award was granted on February 25, 2025 and vested entirely on February 1, 2026.": 14,
-        "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of restricted stock units in shares of common stock on their scheduled vesting date. This restricted stock unit award was granted on March 1, 2019 and vested entirely on February 1, 2020.": 13,
         "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. The number of securities reported reflects the acquisition on January 31, 2020 of 120 shares of Apple Inc.'s common stock pursuant to the Apple Inc. Amended Employee Stock Purchase Plan (\"ESPP\") for the ESPP purchase period of August 1, 2019 through January 31, 2020. Shares withheld by Apple to satisfy tax withholding requirements on vesting of restricted stock units. This transaction was made pursuant to a Rule 10b5-1 trading plan adopted by the reporting person on February 18, 2019. This transaction was executed in multiple trades at prices ranging from $237.44 to $238.43; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $238.44 to $239.34; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $239.59 to $240.57; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $240.59 to $241.49; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $241.74 to $242.73; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $242.74 to $243.705; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $243.81 to $244.57; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $244.97 to $244.985; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This award was granted on October 5, 2015. 36,108 restricted stock units subject to the award vested on each of April 1, 2018 and April 1, 2019 and 36,107 restricted stock units vested on April 1, 2020. This award was granted on October 14, 2016. 28,338 restricted stock units subject to the award vested on each of April 1, 2019 and April 1, 2020 and 28,337 restricted stock units are scheduled to vest on April 1, 2021, assuming continued employment through the applicable vesting date. This award was granted on October 15, 2017. 21,233 restricted stock units subject to the award vested on April 1, 2020 and 21,233 restricted stock units are scheduled to vest on each of April 1, 2021 and April 1, 2022, assuming continued employment through the applicable vesting date.": 13,
+        "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of restricted stock units in shares of common stock on their scheduled vesting date. This restricted stock unit award was granted on March 1, 2019 and vested entirely on February 1, 2020.": 13,
         "The number of restricted stock units (RSUs) includes 280,000 time-based RSUs and 280,000 performance-based RSUs. The number of performance-based RSUs that vested was determined based on Apple's total shareholder return (TSR), relative to the other companies in the S&P 500 over a three-year period from August 25, 2017 through August 24, 2020. TSR is calculated based on the change in a company's stock price during the three-year period, taking into account any dividends paid during that period, which are assumed to be reinvested in the stock. In accordance with the terms of the award, the beginning value used for calculating TSR is the average closing stock price for the 20 trading days prior to August 25, 2017. Apple's beginning value was calculated to be $157.56 (adjusted for dividends). Similarly, the ending value used for calculating TSR is the average closing price for the 20 trading days ending on August 24, 2020. Apple's ending value was calculated to be $464.63 (adjusted for dividends). Mr. Cook's award provides that if Apple's relative TSR performance is within the top third of the companies that remain in the S&P 500 for the entire performance period, the 280,000 performance-based RSUs vest in full. If Apple's performance is in the middle third, the RSUs will be reduced by 50%, and if Apple's performance is in the bottom third, the RSUs will be reduced to zero. Apple needed to achieve a TSR of at least 48.28% to outperform the middle third of the companies in the S&P 500 for the performance period, and at least -3.89% to outperform the bottom third of the companies. Apple's TSR for the three-year period was 194.89%, which ranked 7th of the 442 companies that were included in the S&P 500 for the entire period and placed Apple in the 99th percentile. Therefore, all 280,000 of the RSUs subject to performance requirements vested. Each RSU represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of RSUs in shares of common stock on their scheduled vesting date. These shares are held through Mr. Cook's trust. 294,840 shares (52.65% of the total number of shares released) were withheld by Apple to satisfy tax withholding requirements on vesting of RSUs. This transaction was made pursuant to a Rule 10b5-1 trading plan adopted by the reporting person's trust on February 28, 2020. This transaction was executed in multiple trades at prices ranging from $492.98 to $493.97; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $494.00 to $494.99; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $495.00 to $495.99; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $496.00 to $496.99; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $497.00 to $497.985; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $498.00 to $498.99; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $499.00 to $499.99; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $500.00 to $500.245; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. The remaining 1,260,000 restricted stock units in this award are scheduled to vest on August 24, 2021, assuming continued employment through the applicable vesting date and satisfaction of the applicable performance requirements.": 11,
-        "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. These restricted stock units are scheduled to vest as to one-third of the units on each of April 1, 2025, April 1, 2026, and April 1, 2027. These performance-based restricted stock units are scheduled to vest on October 1, 2025. The \"target\" number of restricted stock units is reported. Between 0% and 200% of the target number of units may vest based on Apple's relative total shareholder return from the first day of Apple's fiscal 2023 and ending with the last day of Apple's fiscal 2025.": 10,
-        "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. This transaction represents the settlement of restricted stock units in shares of common stock on their scheduled vesting date. Adjusted to reflect Apple's 4-for-1 stock split (the \"stock split\"), effective on August 28, 2020. This restricted stock unit award was granted on February 26, 2020 and vested entirely on February 1, 2021. All share amounts have been adjusted to reflect the stock split.": 10
+        "This transaction was made pursuant to a Rule 10b5-1 trading plan adopted by the reporting person on May 13, 2019. This transaction was executed in multiple trades at prices ranging from $259.55 to $260.53; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $260.55 to $261.54; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $261.62 to $262.60; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $262.67 to $263.66; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $263.69 to $264.65; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $264.81 to $265.80; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $265.82 to $266.74; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $266.82 to $267.56; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $267.96 to $268.94; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple. This transaction was executed in multiple trades at prices ranging from $269.00 to $269.87; the price reported above reflects the weighted average sale price. The reporting person hereby undertakes to provide full information regarding the number of shares and prices at which the transactions were effected upon request to the SEC staff, Apple, or a security holder of Apple.": 10,
+        "Each restricted stock unit represents the right to receive, at settlement, one share of common stock. These restricted stock units are scheduled to vest as to one-third of the units on each of April 1, 2025, April 1, 2026, and April 1, 2027. These performance-based restricted stock units are scheduled to vest on October 1, 2025. The \"target\" number of restricted stock units is reported. Between 0% and 200% of the target number of units may vest based on Apple's relative total shareholder return from the first day of Apple's fiscal 2023 and ending with the last day of Apple's fiscal 2025.": 10
       }
     },
     {
@@ -389,16 +389,16 @@
       "outlier_count": 0,
       "outlier_pct": 0.0,
       "top_values": {
-        "data/raw/sec-edgar-filings/AAPL/4/0000320193-20-000039/full-submission.txt": 13,
-        "data/raw/sec-edgar-filings/AAPL/4/0000320193-20-000066/full-submission.txt": 11,
-        "data/raw/sec-edgar-filings/AAPL/4/0000320193-20-000041/full-submission.txt": 10,
-        "data/raw/sec-edgar-filings/AAPL/4/0002050912-25-000008/full-submission.txt": 9,
-        "data/raw/sec-edgar-filings/AAPL/4/0000320193-25-000042/full-submission.txt": 9,
-        "data/raw/sec-edgar-filings/AAPL/4/0000320193-25-000043/full-submission.txt": 9,
-        "data/raw/sec-edgar-filings/AAPL/4/0000320193-20-000045/full-submission.txt": 9,
-        "data/raw/sec-edgar-filings/AAPL/4/0000320193-22-000095/full-submission.txt": 9,
-        "data/raw/sec-edgar-filings/AAPL/4/0000320193-23-000088/full-submission.txt": 8,
-        "data/raw/sec-edgar-filings/AAPL/4/0000320193-24-000110/full-submission.txt": 8
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0000320193-20-000039\\full-submission.txt": 13,
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0000320193-20-000066\\full-submission.txt": 11,
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0000320193-20-000041\\full-submission.txt": 10,
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0000320193-20-000045\\full-submission.txt": 9,
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0002050912-25-000008\\full-submission.txt": 9,
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0000320193-22-000095\\full-submission.txt": 9,
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0000320193-25-000043\\full-submission.txt": 9,
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0000320193-25-000042\\full-submission.txt": 9,
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0000320193-23-000047\\full-submission.txt": 8,
+        "data\\raw\\sec-edgar-filings\\AAPL\\4\\0000320193-24-000110\\full-submission.txt": 8
       }
     },
     {
@@ -485,8 +485,8 @@
       "median": 16457.5,
       "q75": 66263.0,
       "max": 5040000.0,
-      "skewness": 13.82413785196774,
-      "kurtosis": 217.6886383479369,
+      "skewness": 13.824137851967741,
+      "kurtosis": 217.68863834793683,
       "outlier_count": 66,
       "outlier_pct": 8.799999999999999,
       "top_values": null
@@ -505,8 +505,8 @@
       "median": 150.0,
       "q75": 221.68,
       "max": 503.43,
-      "skewness": 0.4905564686784494,
-      "kurtosis": 0.6484815493142029,
+      "skewness": 0.4905564686784495,
+      "kurtosis": 0.6484815493142033,
       "outlier_count": 0,
       "outlier_pct": 0.0,
       "top_values": null
@@ -519,14 +519,14 @@
       "missing_pct": 62.133333333333326,
       "unique": 274,
       "mean": 10142487.021514788,
-      "std": 30608974.453863434,
+      "std": 30608974.45386344,
       "min": 27934.500000000004,
       "q25": 939553.7859499999,
       "median": 2950875.3,
       "q75": 11489566.275,
       "max": 397025647.2,
-      "skewness": 9.694362168650523,
-      "kurtosis": 107.5070106764518,
+      "skewness": 9.694362168650525,
+      "kurtosis": 107.50701067645184,
       "outlier_count": 13,
       "outlier_pct": 4.577464788732395,
       "top_values": null
@@ -562,14 +562,14 @@
       "missing_pct": 0.0,
       "unique": 499,
       "mean": 423420.4,
-      "std": 1000426.0503470462,
+      "std": 1000426.0503470463,
       "min": 0.0,
       "q25": 8075.25,
       "median": 66477.0,
       "q75": 313891.0,
       "max": 8319726.0,
-      "skewness": 3.455695319747491,
-      "kurtosis": 12.482460740554076,
+      "skewness": 3.4556953197474902,
+      "kurtosis": 12.482460740554068,
       "outlier_count": 75,
       "outlier_pct": 10.0,
       "top_values": null
@@ -682,12 +682,12 @@
       "outlier_count": 0,
       "outlier_pct": 0.0,
       "top_values": {
+        "2022-02-01": 16,
         "2023-02-01": 16,
         "2024-02-01": 16,
-        "2022-02-01": 16,
-        "2026-02-01": 14,
         "2021-02-01": 14,
         "2025-02-01": 14,
+        "2026-02-01": 14,
         "2020-02-01": 6,
         "2010-02-25": 1,
         "2011-02-23": 1
@@ -712,12 +712,12 @@
       "outlier_count": 0,
       "outlier_pct": 0.0,
       "top_values": {
+        "2022-02-01": 16,
         "2023-02-01": 16,
         "2024-02-01": 16,
-        "2022-02-01": 16,
-        "2026-02-01": 14,
         "2021-02-01": 14,
         "2025-02-01": 14,
+        "2026-02-01": 14,
         "2020-02-01": 6,
         "2020-02-25": 1,
         "2021-02-23": 1
@@ -731,14 +731,14 @@
       "missing_pct": 57.199999999999996,
       "unique": 96,
       "mean": 66697.4859813084,
-      "std": 293855.249354243,
+      "std": 293855.24935424305,
       "min": 281.0,
       "q25": 1852.0,
       "median": 16612.0,
       "q75": 60932.0,
       "max": 5040000.0,
-      "skewness": 15.2625765680465,
-      "kurtosis": 254.31655188480147,
+      "skewness": 15.262576568046487,
+      "kurtosis": 254.31655188480124,
       "outlier_count": 23,
       "outlier_pct": 7.165109034267912,
       "top_values": null

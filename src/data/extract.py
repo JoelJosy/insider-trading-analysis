@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Tuple
 import pandas as pd
 from tqdm import tqdm
 
+from src.data.market import enrich_with_market_prices
 from src.utils.config import get_config
 from src.utils.logger import setup_logger
 
@@ -367,6 +368,7 @@ def download_and_parse_ticker(
     download_dir: str = "data/raw",
     output_dir: str = "data/processed",
     num_filings: int = 1000,
+    enrich_market_prices: bool = True,
 ) -> Tuple[Optional[Path], pd.DataFrame]:
     dl = SECEdgarDownloader(download_dir)
     dl.download(ticker, limit=num_filings)
@@ -375,6 +377,11 @@ def download_and_parse_ticker(
         logger.warning(f"No files found for {ticker}")
         return None, pd.DataFrame()
     df = parse_filings_to_dataframe(xml_files)
+    if enrich_market_prices and not df.empty:
+        try:
+            df = enrich_with_market_prices(df)
+        except Exception as e:
+            logger.warning(f"Market price enrichment skipped due to error: {e}")
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     csv_path = out / f"{ticker}_form4.csv"
@@ -390,8 +397,15 @@ if __name__ == "__main__":
     p.add_argument("--num-filings", type=int, default=100)
     p.add_argument("--download-dir", default="data/raw")
     p.add_argument("--output-dir", default="data/processed")
+    p.add_argument("--skip-market-prices", action="store_true", help="Skip yfinance close-price enrichment")
     args = p.parse_args()
-    csv_path, df = download_and_parse_ticker(args.ticker, args.download_dir, args.output_dir, args.num_filings)
+    csv_path, df = download_and_parse_ticker(
+        args.ticker,
+        args.download_dir,
+        args.output_dir,
+        args.num_filings,
+        enrich_market_prices=not args.skip_market_prices,
+    )
     if not df.empty:
         print(f"Parsed {len(df)} transactions -> {csv_path}")
         print(df.head())

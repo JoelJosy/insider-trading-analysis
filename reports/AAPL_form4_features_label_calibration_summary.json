@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-02-26T21:24:08.087300",
+  "input_csv": "data/processed/AAPL_form4_features.csv",
+  "horizon_days": 30,
+  "benchmark_ticker": "SPY",
+  "target_informed_pct_range": [
+    5.0,
+    20.0
+  ],
+  "threshold_candidates": [
+    0.03,
+    0.05,
+    0.08,
+    0.1,
+    0.12,
+    0.15
+  ],
+  "confidence_candidates": [
+    1,
+    2
+  ],
+  "price_coverage_pct": 98.07,
+  "recommendation": {
+    "abnormal_threshold": 0.05,
+    "confidence_sources_required": 1,
+    "informed_pct": 11.602209944751381,
+    "coverage_pct": 98.06629834254143
+  }
+}
