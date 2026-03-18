@@ -1,18 +1,19 @@
 # Phase 3 Label Quality Report
 
-**Generated:** 2026-02-26T21:53:01.246125
+**Generated:** 2026-03-18T13:34:00.954763
 
 **Input CSV:** data/processed/AAPL_form4_features.csv
 
 ---
 
 ## Coverage
-- Forward return coverage: 710 rows (98.07%)
-- Benchmark return coverage: 710 rows (98.07%)
+- Forward return coverage: 724 rows (100.0%)
+- Benchmark return coverage: 724 rows (100.0%)
 
 ## Label Distribution
-- Informed: 88 (12.15%)
-- Routine: 636 (87.85%)
+- Opportunistic: 19 (2.62%)
+- Routine: 188 (25.97%)
+- Uncertain: 517 (71.41%)
 
 ## Signal Counts
 - Price signal rows: 97

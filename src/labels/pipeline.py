@@ -249,7 +249,64 @@ def add_enforcement_confirmation(df: pd.DataFrame, enforcement_csv: str | None, 
     return df
 
 
+def _plan_flag(df: pd.DataFrame) -> pd.Series:
+    has_plan = pd.to_numeric(df.get("has_plan", 0), errors="coerce").fillna(0)
+    footnote_has_plan = pd.to_numeric(df.get("footnote_has_plan", 0), errors="coerce").fillna(0)
+    return ((has_plan == 1) | (footnote_has_plan == 1)).astype(int)
+
+
+def _cohen_routine_mask(df: pd.DataFrame) -> pd.Series:
+    insider = df.get("insider_cik", pd.Series(index=df.index, dtype=object)).astype(str)
+    txn_dates = pd.to_datetime(df.get("transaction_date", pd.Series(index=df.index)), errors="coerce")
+
+    months_df = pd.DataFrame(
+        {
+            "row_id": df.index,
+            "insider_cik": insider,
+            "year": txn_dates.dt.year,
+            "month": txn_dates.dt.month,
+        }
+    )
+    months_df = months_df.dropna(subset=["year", "month"]).copy()
+    if months_df.empty:
+        return pd.Series(False, index=df.index)
+
+    months_df["year"] = months_df["year"].astype(int)
+    months_df["month"] = months_df["month"].astype(int)
+
+    # Unique insider-month-year combinations to evaluate historical streaks.
+    uniq = months_df[["insider_cik", "year", "month"]].drop_duplicates().copy()
+    uniq = uniq.sort_values(["insider_cik", "month", "year"])
+
+    routine_pairs: set[tuple[str, int, int]] = set()
+    for (insider_cik, month), group in uniq.groupby(["insider_cik", "month"], sort=False):
+        years = group["year"].tolist()
+        years_set = set(years)
+        for year in years:
+            prior_streak = 0
+            prev = year - 1
+            while prev in years_set:
+                prior_streak += 1
+                prev -= 1
+            if prior_streak >= 2:
+                routine_pairs.add((insider_cik, month, year))
+
+    current_pairs = list(zip(months_df["insider_cik"], months_df["month"], months_df["year"]))
+    months_df["cohen_routine"] = [pair in routine_pairs for pair in current_pairs]
+
+    out = pd.Series(False, index=df.index)
+    flagged = months_df.loc[months_df["cohen_routine"], "row_id"]
+    out.loc[flagged] = True
+    return out
+
+
 def combine_signals(df: pd.DataFrame, confidence_sources_required: int) -> pd.DataFrame:
+    """
+    Assign behavioral proxy labels.
+
+    Kept under the original function name for backward compatibility with
+    existing imports (e.g., calibration module).
+    """
     df = df.copy()
     for col in ("price_signal", "earnings_proximity_flag", "enforcement_followup_flag"):
         if col not in df.columns:
@@ -261,16 +318,49 @@ def combine_signals(df: pd.DataFrame, confidence_sources_required: int) -> pd.Da
         + df["enforcement_followup_flag"].fillna(0).astype(int)
     )
 
-    df["informed_label"] = (df["label_source_count"] >= confidence_sources_required).astype(int)
-    df["routine_label"] = 1 - df["informed_label"]
-    df["label_name"] = np.where(df["informed_label"] == 1, "informed", "routine")
-    df["label_confidence"] = np.select(
-        [
-            df["label_source_count"] >= (confidence_sources_required + 1),
-            df["label_source_count"] == confidence_sources_required,
-        ],
-        ["high", "medium"],
-        default="low",
+    code = _normalize_code(df.get("transaction_code", pd.Series(index=df.index, dtype=str)))
+    open_market_mask = code.isin({"P", "S"})
+    excluded_mask = code.isin({"M", "A", "F", "G", "D"})
+
+    # Only open-market P/S trades receive Cohen labels.
+    # All non-open-market trades are uncertain for supervised labels.
+    df["cohen_label"] = -1
+    if open_market_mask.any():
+        cohen_routine_open = _cohen_routine_mask(df.loc[open_market_mask])
+        df.loc[open_market_mask, "cohen_label"] = np.where(cohen_routine_open, 0, 1).astype(int)
+
+    # 10b5-1 override applies only to open-market rows that are label-eligible.
+    df["plan_override"] = 0
+    if open_market_mask.any():
+        plan_flags_open = _plan_flag(df.loc[open_market_mask]).astype(int)
+        df.loc[open_market_mask, "plan_override"] = plan_flags_open.values
+
+    df["final_label"] = -1
+    if open_market_mask.any():
+        df.loc[open_market_mask, "final_label"] = np.where(
+            df.loc[open_market_mask, "plan_override"] == 1,
+            0,
+            df.loc[open_market_mask, "cohen_label"],
+        ).astype(int)
+
+    # Explicitly keep listed excluded transaction codes as uncertain.
+    df.loc[excluded_mask, "cohen_label"] = -1
+    df.loc[excluded_mask, "final_label"] = -1
+
+    # Compatibility aliases for downstream code expecting prior naming.
+    df["informed_label"] = (df["final_label"] == 1).astype(int)
+    df["routine_label"] = (df["final_label"] == 0).astype(int)
+    df["label_name"] = np.where(
+        df["final_label"] == 1,
+        "opportunistic",
+        np.where(df["final_label"] == 0, "routine", "uncertain"),
+    )
+
+    # Confidence reflects behavioral-label certainty.
+    df["label_confidence"] = np.where(
+        df["final_label"] == -1,
+        "uncertain",
+        np.where(df["plan_override"] == 1, "high", "medium"),
     )
     return df
 

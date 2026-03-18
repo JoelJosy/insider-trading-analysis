@@ -1,6 +1,6 @@
 # Insider Trading Analysis
 
-> ML system that analyzes SEC Form 4 insider trading filings to classify routine vs informed trades and predict future stock movement signals.
+> ML system that analyzes SEC Form 4 insider trading filings to classify routine vs opportunistic trades using behavioral proxies and validate with market/regulatory signals.
 
 Pattern Recognition Project | Data Warehousing Course
 
@@ -159,8 +159,9 @@ Step 5 — FEATURES (src/features/pipeline.py)
       │
       ▼
 Step 6 — LABELING (src/labels/pipeline.py)
-  Builds ground-truth labels (routine vs informed)
-  using abnormal returns + optional earnings/enforcement confirmations
+  Builds behavioral-proxy labels (routine vs opportunistic)
+  using Cohen heuristic + 10b5-1 plan override
+  while keeping price/earnings/enforcement signals for validation
       │
       ▼
 Step 7 — (Future) MODELS
@@ -310,14 +311,21 @@ python -m src.labels.pipeline --input data/processed/AAPL_form4_features.csv
 **What it does:**
 
 - Loads your features (or processed) CSV with `ticker` + `transaction_date`
-- Fetches horizon forward prices and computes directional abnormal return vs `SPY`
-- Creates `price_signal` using threshold from `config.labeling.abnormal_return_threshold`
-- Optionally adds confirmations from:
+- Computes behavioral labels with open-market filtering:
+  - Applies Cohen heuristic only on `transaction_code` in `{P, S}`
+  - `cohen_label = 0` (routine) if same insider traded in the same calendar month in 2+ prior consecutive years, else `1` (opportunistic)
+  - Applies 10b5-1 override (`has_plan` or `footnote_has_plan` = 1) to force `final_label = 0`
+  - Sets `cohen_label = -1` and `final_label = -1` for excluded/non-open-market codes (`M, A, F, G, D`) as **uncertain**
+- Also computes outcome validation signals (not training labels):
+  - directional abnormal return vs `SPY`
+  - `price_signal` from `config.labeling.abnormal_return_threshold`
+  - optional earnings/enforcement confirmation flags from:
   - `data/external/earnings/earnings_announcements.csv` (`ticker`, `announcement_date`)
   - `data/external/sec/sec_enforcement.csv` (`ticker`, `action_date`)
-- Combines signal count into final labels:
-  - `informed_label` / `routine_label`
-  - `label_name`, `label_confidence`, `label_source_count`
+- Writes label columns:
+  - `cohen_label`, `plan_override`, `final_label`
+  - compatibility aliases: `informed_label`, `routine_label`, `label_name`, `label_confidence`
+  - validation context: `price_signal`, `abnormal_return`, `label_source_count`, etc.
 - Fails fast if benchmark/ticker market prices are unavailable (prevents silent all-routine labels)
 - Generates Phase 3 label quality report (JSON + Markdown)
 
@@ -339,6 +347,18 @@ python -m src.labels.pipeline \
   --benchmark SPY
 ```
 
+Training-ready subset (exclude uncertain labels):
+
+```bash
+python - <<'PY'
+import pandas as pd
+df = pd.read_csv("data/processed/AAPL_form4_features_labeled_behavioral.csv")
+train = df[df["final_label"].isin([0, 1])].copy()
+train.to_csv("data/processed/AAPL_form4_features_labeled_behavioral_train.csv", index=False)
+print(train["final_label"].value_counts().to_dict())
+PY
+```
+
 If you must continue without market prices (debug only):
 
 ```bash
@@ -351,7 +371,7 @@ If Yahoo fetch fails repeatedly, upgrade `yfinance` in your environment:
 pip install --upgrade yfinance
 ```
 
-### Step 6.1 — Calibration Sweep (recommended)
+### Step 6.1 — Validation Signal Calibration (optional)
 
 ```bash
 python -m src.labels.calibrate --input data/processed/AAPL_form4_features.csv
@@ -359,9 +379,9 @@ python -m src.labels.calibrate --input data/processed/AAPL_form4_features.csv
 
 **What it does:**
 
-- Sweeps multiple `abnormal_threshold` and `confidence_sources_required` combinations
-- Measures informed-label percentage under each combo
-- Recommends settings closest to a target informed-label range
+- Sweeps outcome-signal thresholds (`abnormal_threshold`, confidence-source settings)
+- Reports how outcome-driven label proportions would change under those settings
+- Useful for validation diagnostics; behavioral labels in Step 6 are still driven by Cohen + plan override
 
 **What it updates:**
 | Location | Detail |

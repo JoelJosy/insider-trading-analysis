@@ -172,10 +172,21 @@ def get_close_prices(
     path = _cache_path(cache_dir, ticker)
     cached = _read_cache(path)
 
-    need_fetch = cached.empty or start < cached.index.min() or end > cached.index.max()
+    # Clamp end to today: future prices don't exist, so never attempt to fetch them.
+    today = pd.Timestamp.today().normalize()
+    effective_end = min(end, today)
+
+    # Allow up to 5 calendar days of cache lag (covers weekends + holidays)
+    # before triggering a network fetch on the upper edge.
+    _LAG_TOLERANCE = pd.Timedelta(days=5)
+    need_fetch = (
+        cached.empty
+        or start < cached.index.min()
+        or effective_end > cached.index.max() + _LAG_TOLERANCE
+    )
     if need_fetch:
         fetch_start = start if cached.empty else min(start, cached.index.min())
-        fetch_end = end if cached.empty else max(end, cached.index.max())
+        fetch_end = effective_end if cached.empty else max(effective_end, cached.index.max())
         fresh = _download_close_prices(ticker, fetch_start, fetch_end)
         if fresh.empty and cached.empty:
             logger.warning("No market prices returned for %s", ticker)

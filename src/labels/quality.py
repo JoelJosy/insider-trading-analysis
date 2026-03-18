@@ -14,8 +14,15 @@ def _safe_pct(num: int, den: int) -> float:
 
 def build_label_quality_summary(df: pd.DataFrame, input_csv: str, params: dict[str, Any]) -> dict[str, Any]:
     total = len(df)
-    informed = int(df.get("informed_label", pd.Series(dtype=int)).fillna(0).astype(int).sum())
-    routine = int(df.get("routine_label", pd.Series(dtype=int)).fillna(0).astype(int).sum())
+    if "final_label" in df.columns:
+        final = pd.to_numeric(df["final_label"], errors="coerce").fillna(-1).astype(int)
+        opportunistic = int((final == 1).sum())
+        routine = int((final == 0).sum())
+        uncertain = int((final == -1).sum())
+    else:
+        opportunistic = int(df.get("informed_label", pd.Series(dtype=int)).fillna(0).astype(int).sum())
+        routine = int(df.get("routine_label", pd.Series(dtype=int)).fillna(0).astype(int).sum())
+        uncertain = max(total - opportunistic - routine, 0)
 
     price_cov = int(df.get("forward_return", pd.Series(dtype=float)).notna().sum()) if "forward_return" in df.columns else 0
     bench_cov = int(df.get("benchmark_return", pd.Series(dtype=float)).notna().sum()) if "benchmark_return" in df.columns else 0
@@ -30,15 +37,15 @@ def build_label_quality_summary(df: pd.DataFrame, input_csv: str, params: dict[s
             source_count_dist[str(int(key))] = int(val)
 
     recommendations: list[str] = []
-    informed_pct = _safe_pct(informed, total)
+    opportunistic_pct = _safe_pct(opportunistic, total)
     price_cov_pct = _safe_pct(price_cov, total)
 
     if price_cov_pct < 90:
         recommendations.append("Price coverage is below 90%; re-run labeling later or verify market source access.")
-    if informed_pct < 1:
-        recommendations.append("Informed share is very low (<1%); consider lowering abnormal threshold or confidence requirement.")
-    elif informed_pct > 40:
-        recommendations.append("Informed share is high (>40%); consider stricter threshold or additional confirmation sources.")
+    if opportunistic_pct < 1:
+        recommendations.append("Opportunistic share is very low (<1%); review Cohen/plan rules for over-conservative labeling.")
+    elif opportunistic_pct > 40:
+        recommendations.append("Opportunistic share is high (>40%); review Cohen/plan rules for over-sensitive labeling.")
 
     if earnings_signal == 0:
         recommendations.append("No earnings confirmations found; provide earnings CSV to improve multi-source labeling.")
@@ -60,10 +67,12 @@ def build_label_quality_summary(df: pd.DataFrame, input_csv: str, params: dict[s
             "benchmark_return_pct": round(_safe_pct(bench_cov, total), 2),
         },
         "labels": {
-            "informed_rows": informed,
-            "informed_pct": round(informed_pct, 2),
+            "opportunistic_rows": opportunistic,
+            "opportunistic_pct": round(opportunistic_pct, 2),
             "routine_rows": routine,
             "routine_pct": round(_safe_pct(routine, total), 2),
+            "uncertain_rows": uncertain,
+            "uncertain_pct": round(_safe_pct(uncertain, total), 2),
         },
         "signals": {
             "price_signal_rows": price_signal,
@@ -89,8 +98,9 @@ def summary_to_markdown(summary: dict[str, Any]) -> str:
         f"- Forward return coverage: {coverage['forward_return_rows']} rows ({coverage['forward_return_pct']}%)",
         f"- Benchmark return coverage: {coverage['benchmark_return_rows']} rows ({coverage['benchmark_return_pct']}%)",
         "\n## Label Distribution",
-        f"- Informed: {labels['informed_rows']} ({labels['informed_pct']}%)",
+        f"- Opportunistic: {labels['opportunistic_rows']} ({labels['opportunistic_pct']}%)",
         f"- Routine: {labels['routine_rows']} ({labels['routine_pct']}%)",
+        f"- Uncertain: {labels['uncertain_rows']} ({labels['uncertain_pct']}%)",
         "\n## Signal Counts",
         f"- Price signal rows: {signals['price_signal_rows']}",
         f"- Earnings signal rows: {signals['earnings_signal_rows']}",
