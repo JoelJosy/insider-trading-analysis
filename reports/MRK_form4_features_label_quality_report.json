@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-03-18T22:57:41.516699",
+  "input_csv": "data/processed/MRK_form4_features.csv",
+  "params": {
+    "horizon_days": 30,
+    "benchmark_ticker": "SPY",
+    "abnormal_threshold": 0.05,
+    "confidence_sources_required": 2,
+    "earnings_proximity_days": 30,
+    "earnings_csv": "data/external/earnings/earnings_announcements.csv",
+    "enforcement_csv": "data/external/sec/sec_enforcement.csv",
+    "enforcement_lookahead_days": 365
+  },
+  "rows": 456,
+  "coverage": {
+    "forward_return_rows": 456,
+    "forward_return_pct": 100.0,
+    "benchmark_return_rows": 456,
+    "benchmark_return_pct": 100.0
+  },
+  "labels": {
+    "opportunistic_rows": 45,
+    "opportunistic_pct": 9.87,
+    "routine_rows": 13,
+    "routine_pct": 2.85,
+    "uncertain_rows": 398,
+    "uncertain_pct": 87.28
+  },
+  "signals": {
+    "price_signal_rows": 74,
+    "earnings_signal_rows": 0,
+    "enforcement_signal_rows": 0,
+    "label_source_count_distribution": {
+      "0": 382,
+      "1": 74
+    }
+  },
+  "recommendations": [
+    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
+    "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
+  ]
+}

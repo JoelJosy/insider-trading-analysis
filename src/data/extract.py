@@ -1,6 +1,7 @@
 import re
 import time
 import xml.etree.ElementTree as ET
+import os
 from dataclasses import dataclass, field
 from datetime import datetime, date
 from pathlib import Path
@@ -277,6 +278,16 @@ class SECEdgarDownloader:
         self.download_dir.mkdir(parents=True, exist_ok=True)
         self.logger = setup_logger(self.__class__.__name__, "logs/downloader.log")
         self._last_request = 0.0
+        self.app_name = os.getenv("SEC_EDGAR_APP_NAME", "InsiderTradingAnalysis")
+        self.contact_email = os.getenv("SEC_EDGAR_CONTACT_EMAIL", "joeljosy449@gmail.com")
+        self.max_retries = int(os.getenv("SEC_EDGAR_MAX_RETRIES", "5"))
+        self.base_backoff_seconds = float(os.getenv("SEC_EDGAR_BACKOFF_SECONDS", "2"))
+
+    @staticmethod
+    def _is_retryable_error(error: Exception) -> bool:
+        message = str(error).lower()
+        retry_markers = ("429", "500", "502", "503", "504", "timeout", "temporar", "connection")
+        return any(marker in message for marker in retry_markers)
 
     def _throttle(self):
         interval = 1.0 / self.config.sec_edgar.rate_limit_per_second
@@ -288,11 +299,29 @@ class SECEdgarDownloader:
     def download(self, ticker: str, start_date: Optional[str] = None, end_date: Optional[str] = None, limit: int = 1000) -> Path:
         from sec_edgar_downloader import Downloader
         cfg = self.config.sec_edgar
-        dl = Downloader("InsiderTradingAnalysis", "research@example.com", download_folder=str(self.download_dir))
-        self._throttle()
-        dl.get("4", ticker, after=start_date or cfg.start_date, before=end_date or cfg.end_date, limit=limit)
-        self.logger.info(f"Downloaded Form 4 filings for {ticker}")
-        return self.download_dir / ticker
+        dl = Downloader(self.app_name, self.contact_email, download_folder=str(self.download_dir))
+
+        last_error: Optional[Exception] = None
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                self._throttle()
+                dl.get("4", ticker, after=start_date or cfg.start_date, before=end_date or cfg.end_date, limit=limit)
+                self.logger.info(f"Downloaded Form 4 filings for {ticker}")
+                return self.download_dir / ticker
+            except Exception as e:
+                last_error = e
+                if attempt >= self.max_retries or not self._is_retryable_error(e):
+                    break
+                backoff = self.base_backoff_seconds * (2 ** (attempt - 1))
+                self.logger.warning(
+                    f"SEC download failed for {ticker} (attempt {attempt}/{self.max_retries}): {e}. "
+                    f"Retrying in {backoff:.1f}s"
+                )
+                time.sleep(backoff)
+
+        raise RuntimeError(
+            f"Failed to download Form 4 filings for {ticker} after {self.max_retries} attempts"
+        ) from last_error
 
     def find_files(self, ticker: str) -> List[Path]:
         base = self.download_dir / "sec-edgar-filings" / ticker / "4"

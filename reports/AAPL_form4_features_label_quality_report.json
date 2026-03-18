@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T13:34:00.954763",
+  "generated_at": "2026-03-18T22:32:18.802616",
   "input_csv": "data/processed/AAPL_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -11,29 +11,29 @@
     "enforcement_csv": "data/external/sec/sec_enforcement.csv",
     "enforcement_lookahead_days": 365
   },
-  "rows": 724,
+  "rows": 1362,
   "coverage": {
-    "forward_return_rows": 724,
+    "forward_return_rows": 1362,
     "forward_return_pct": 100.0,
-    "benchmark_return_rows": 724,
+    "benchmark_return_rows": 1362,
     "benchmark_return_pct": 100.0
   },
   "labels": {
-    "opportunistic_rows": 19,
-    "opportunistic_pct": 2.62,
-    "routine_rows": 188,
-    "routine_pct": 25.97,
-    "uncertain_rows": 517,
-    "uncertain_pct": 71.41
+    "opportunistic_rows": 68,
+    "opportunistic_pct": 4.99,
+    "routine_rows": 329,
+    "routine_pct": 24.16,
+    "uncertain_rows": 965,
+    "uncertain_pct": 70.85
   },
   "signals": {
-    "price_signal_rows": 97,
-    "earnings_signal_rows": 565,
+    "price_signal_rows": 273,
+    "earnings_signal_rows": 1111,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 150,
-      "1": 486,
-      "2": 88
+      "0": 207,
+      "1": 926,
+      "2": 229
     }
   },
   "recommendations": [

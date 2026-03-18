@@ -14,14 +14,14 @@ database:
 # SEC EDGAR Configuration
 sec_edgar:
   base_url: "https://www.sec.gov"
-  rate_limit_per_second: 10
+  rate_limit_per_second: 5
   user_agent: "InsiderTradingAnalysis/1.0 (Research Project)"
   form_types:
     - "4"
-    - "4/A" # Amendments
+    - "4/A"
   date_range:
-    start: "2020-01-01"
-    end: "2026-02-26"
+    start: "2015-01-01"
+    end: "2025-12-31"
 
 # Data Paths
 paths:

@@ -41,6 +41,32 @@ def _normalize_code(series: pd.Series) -> pd.Series:
     return series.astype(str).str.strip().str.upper()
 
 
+def _normalize_ticker(series: pd.Series) -> pd.Series:
+    cleaned = series.astype(str).str.strip().str.upper()
+    invalid = cleaned.isin({"", "NAN", "NONE", "NULL"})
+    return cleaned.mask(invalid)
+
+
+def _pricing_ticker_series(df: pd.DataFrame) -> pd.Series:
+    issuer = _normalize_ticker(df.get("issuer_ticker", pd.Series(index=df.index, dtype=object)))
+    primary = _normalize_ticker(df.get("ticker", pd.Series(index=df.index, dtype=object)))
+
+    if issuer.notna().any():
+        dominant_issuer = issuer.dropna().mode().iloc[0]
+        return issuer.fillna(dominant_issuer)
+
+    return primary
+
+
+def _infer_focus_ticker(input_csv: str) -> str | None:
+    stem = Path(input_csv).stem.upper()
+    marker = "_FORM4"
+    if marker in stem:
+        candidate = stem.split(marker, 1)[0].strip()
+        return candidate or None
+    return None
+
+
 def _trade_direction(df: pd.DataFrame) -> pd.Series:
     if "trade_direction" in df.columns:
         return pd.to_numeric(df["trade_direction"], errors="coerce").fillna(0).astype(int)
@@ -131,6 +157,7 @@ def add_price_labels(
 ) -> pd.DataFrame:
     df = df.copy()
     df["trade_direction"] = _trade_direction(df)
+    pricing_ticker = _pricing_ticker_series(df)
 
     txn_dates = pd.to_datetime(df["transaction_date"], errors="coerce").dt.normalize()
     target_dates = txn_dates + pd.to_timedelta(horizon_days, unit="D")
@@ -144,11 +171,16 @@ def add_price_labels(
     if pd.isna(min_date) or pd.isna(max_target):
         raise ValueError("transaction_date is empty or invalid")
 
+    max_attempts = 3 if require_prices else 1
+    backoff_base_seconds = 3.0 if require_prices else 0.0
+
     benchmark_prices = get_close_prices(
         benchmark_ticker,
         min_date - pd.Timedelta(days=10),
         max_target + pd.Timedelta(days=10),
         cache_dir=price_cache_dir,
+        max_attempts_per_method=max_attempts,
+        backoff_base_seconds=backoff_base_seconds,
     )
     if benchmark_prices.empty and require_prices:
         raise RuntimeError(
@@ -161,8 +193,8 @@ def add_price_labels(
     df["benchmark_return"] = ((bench_future - bench_txn) / bench_txn).replace([np.inf, -np.inf], np.nan)
 
     missing_tickers: list[str] = []
-    for ticker in df["ticker"].dropna().astype(str).str.upper().unique():
-        mask = df["ticker"].astype(str).str.upper() == ticker
+    for ticker in pricing_ticker.dropna().unique():
+        mask = pricing_ticker == ticker
         t_dates = txn_dates[mask]
         f_dates = target_dates[mask]
 
@@ -171,6 +203,8 @@ def add_price_labels(
             t_dates.min() - pd.Timedelta(days=10),
             f_dates.max() + pd.Timedelta(days=10),
             cache_dir=price_cache_dir,
+            max_attempts_per_method=max_attempts,
+            backoff_base_seconds=backoff_base_seconds,
         )
         if prices.empty:
             missing_tickers.append(ticker)
@@ -193,7 +227,7 @@ def add_price_labels(
     logger.info("Price coverage for forward returns: %.1f%%", coverage_pct)
 
     if missing_tickers:
-        msg = f"No market prices returned for tickers: {', '.join(sorted(set(missing_tickers)))}"
+        msg = f"No market prices returned for pricing tickers: {', '.join(sorted(set(missing_tickers)))}"
         if require_prices:
             raise RuntimeError(msg)
         logger.warning(msg)
@@ -211,12 +245,13 @@ def add_earnings_confirmation(df: pd.DataFrame, earnings_csv: str | None, proxim
     df = df.copy()
     earnings = _load_optional_dates(earnings_csv, date_col="announcement_date")
     df["earnings_proximity_flag"] = 0
+    pricing_ticker = _pricing_ticker_series(df)
 
     if earnings.empty:
         return df
 
-    for ticker in df["ticker"].dropna().astype(str).str.upper().unique():
-        trade_mask = df["ticker"].astype(str).str.upper() == ticker
+    for ticker in pricing_ticker.dropna().unique():
+        trade_mask = pricing_ticker == ticker
         event_dates = earnings.loc[earnings["ticker"] == ticker, "announcement_date"].dropna().sort_values().values
         if len(event_dates) == 0:
             continue
@@ -232,12 +267,13 @@ def add_enforcement_confirmation(df: pd.DataFrame, enforcement_csv: str | None, 
     df = df.copy()
     enforcement = _load_optional_dates(enforcement_csv, date_col="action_date")
     df["enforcement_followup_flag"] = 0
+    pricing_ticker = _pricing_ticker_series(df)
 
     if enforcement.empty:
         return df
 
-    for ticker in df["ticker"].dropna().astype(str).str.upper().unique():
-        trade_mask = df["ticker"].astype(str).str.upper() == ticker
+    for ticker in pricing_ticker.dropna().unique():
+        trade_mask = pricing_ticker == ticker
         event_dates = enforcement.loc[enforcement["ticker"] == ticker, "action_date"].dropna().sort_values().values
         if len(event_dates) == 0:
             continue
@@ -385,8 +421,24 @@ def build_labels(
     price_cache_dir: str = "data/external/prices",
     require_prices: bool = True,
     report_dir: str = "reports",
+    focus_ticker: str | None = None,
 ) -> pd.DataFrame:
     df = _load_input(input_csv)
+
+    effective_focus = (focus_ticker or _infer_focus_ticker(input_csv) or "").strip().upper()
+    pricing_ticker = _pricing_ticker_series(df)
+    unique_pricing = sorted(pricing_ticker.dropna().unique().tolist())
+    if effective_focus and unique_pricing and len(unique_pricing) > 1 and effective_focus in unique_pricing:
+        before_rows = len(df)
+        df = df.loc[pricing_ticker == effective_focus].copy()
+        logger.warning(
+            "Detected mixed pricing tickers (%d). Filtering to %s inferred from input name (%d -> %d rows).",
+            len(unique_pricing),
+            effective_focus,
+            before_rows,
+            len(df),
+        )
+
     df = add_price_labels(
         df,
         horizon_days=horizon_days,
@@ -478,6 +530,11 @@ def _parse_args() -> argparse.Namespace:
         action="store_true",
         help="Continue labeling even when market prices are missing (not recommended)",
     )
+    p.add_argument(
+        "--focus-ticker",
+        default=None,
+        help="Optional ticker filter for mixed-symbol inputs (defaults to inferred ticker from input filename)",
+    )
     p.add_argument("--report-dir", default="reports", help="Directory for label quality reports")
     return p.parse_args()
 
@@ -505,6 +562,7 @@ if __name__ == "__main__":
         price_cache_dir=args.price_cache_dir,
         require_prices=not args.allow_missing_prices,
         report_dir=args.report_dir,
+        focus_ticker=args.focus_ticker,
     )
 
     print(f"\nDone. Labeled dataset -> {output_path}")

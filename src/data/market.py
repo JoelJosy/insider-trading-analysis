@@ -1,12 +1,17 @@
 from datetime import timedelta
 from io import StringIO
 from pathlib import Path
+import os
 import time
 
 import numpy as np
 import pandas as pd
 import requests
-import yfinance as yf
+
+try:
+    import yfinance as yf
+except Exception:
+    yf = None
 
 from src.utils.logger import setup_logger
 
@@ -63,6 +68,8 @@ def _extract_close_from_history(history: pd.DataFrame) -> pd.Series:
 
 
 def _download_via_download(ticker: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.Series:
+    if yf is None:
+        raise RuntimeError("yfinance is not available")
     _throttle_yf_calls()
     history = yf.download(
         ticker,
@@ -77,6 +84,8 @@ def _download_via_download(ticker: str, start: pd.Timestamp, end: pd.Timestamp) 
 
 
 def _download_via_ticker_history(ticker: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.Series:
+    if yf is None:
+        raise RuntimeError("yfinance is not available")
     _throttle_yf_calls()
     tk = yf.Ticker(ticker)
     history = tk.history(
@@ -89,31 +98,56 @@ def _download_via_ticker_history(ticker: str, start: pd.Timestamp, end: pd.Times
 
 
 def _download_via_stooq(ticker: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.Series:
-    symbol = f"{ticker.lower()}.us"
-    url = f"https://stooq.com/q/d/l/?s={symbol}&i=d"
-    _throttle_yf_calls()
-    response = requests.get(url, timeout=20)
-    response.raise_for_status()
+    candidates = [f"{ticker.lower()}.us", ticker.lower()]
+    for symbol in candidates:
+        url = f"https://stooq.com/q/d/l/?s={symbol}&i=d"
+        _throttle_yf_calls()
+        response = requests.get(url, timeout=20)
+        response.raise_for_status()
 
-    if not response.text.strip() or response.text.strip().startswith("No data"):
-        return pd.Series(dtype=float)
+        if not response.text.strip() or response.text.strip().startswith("No data"):
+            continue
 
-    df = pd.read_csv(
-        StringIO(response.text),
-        parse_dates=["Date"],
-    )
-    if df.empty or "Close" not in df.columns:
-        return pd.Series(dtype=float)
+        df = pd.read_csv(
+            StringIO(response.text),
+            parse_dates=["Date"],
+        )
+        if df.empty or "Close" not in df.columns:
+            continue
 
-    df = df.rename(columns={"Date": "date", "Close": "close"})
-    df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.normalize()
-    df = df.dropna(subset=["date", "close"])
-    df = df[(df["date"] >= start) & (df["date"] <= end)]
-    if df.empty:
-        return pd.Series(dtype=float)
+        df = df.rename(columns={"Date": "date", "Close": "close"})
+        df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.normalize()
+        df = df.dropna(subset=["date", "close"])
+        df = df[(df["date"] >= start) & (df["date"] <= end)]
+        if df.empty:
+            continue
 
-    close = df.set_index("date")["close"].astype(float).sort_index()
-    return close
+        close = df.set_index("date")["close"].astype(float).sort_index()
+        return close
+
+    return pd.Series(dtype=float)
+
+
+def _provider_methods() -> dict[str, callable]:
+    methods = {
+        "stooq": _download_via_stooq,
+        "download": _download_via_download,
+        "ticker.history": _download_via_ticker_history,
+    }
+    if yf is None:
+        methods.pop("download", None)
+        methods.pop("ticker.history", None)
+    return methods
+
+
+def _provider_sequence() -> list[str]:
+    raw = os.getenv("MARKET_DATA_PROVIDERS", "stooq,download,ticker.history")
+    requested = [p.strip() for p in raw.split(",") if p.strip()]
+    available = _provider_methods()
+    sequence = [p for p in requested if p in available]
+    if sequence:
+        return sequence
+    return list(available.keys())
 
 
 def _cache_path(cache_dir: str, ticker: str) -> Path:
@@ -141,14 +175,20 @@ def _write_cache(path: Path, prices: pd.Series) -> None:
     out.to_csv(path, index=False)
 
 
-def _download_close_prices(ticker: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.Series:
-    methods = (
-        ("download", _download_via_download),
-        ("ticker.history", _download_via_ticker_history),
-        ("stooq", _download_via_stooq),
-    )
+def _download_close_prices(
+    ticker: str,
+    start: pd.Timestamp,
+    end: pd.Timestamp,
+    max_attempts_per_method: int = 3,
+    backoff_base_seconds: float = 3.0,
+) -> pd.Series:
+    methods_map = _provider_methods()
+    methods = [(name, methods_map[name]) for name in _provider_sequence() if name in methods_map]
+    attempts = max(1, int(max_attempts_per_method))
+    base_backoff = max(0.0, float(backoff_base_seconds))
+
     for method_name, method in methods:
-        for attempt in range(1, 4):
+        for attempt in range(1, attempts + 1):
             try:
                 close = method(ticker, start, end)
                 if not close.empty:
@@ -156,10 +196,12 @@ def _download_close_prices(ticker: str, start: pd.Timestamp, end: pd.Timestamp) 
                         logger.info("Recovered market data for %s via %s on attempt %d", ticker, method_name, attempt)
                     return close
             except Exception as e:
-                logger.warning("%s failed for %s (attempt %d/3): %s", method_name, ticker, attempt, e)
-            backoff = 3 * attempt
-            logger.info("Backing off %.1fs before retry for %s", backoff, ticker)
-            time.sleep(backoff)
+                logger.warning("%s failed for %s (attempt %d/%d): %s", method_name, ticker, attempt, attempts, e)
+
+            if attempt < attempts:
+                backoff = base_backoff * attempt
+                logger.info("Backing off %.1fs before retry for %s", backoff, ticker)
+                time.sleep(backoff)
     return pd.Series(dtype=float)
 
 
@@ -168,6 +210,8 @@ def get_close_prices(
     start: pd.Timestamp,
     end: pd.Timestamp,
     cache_dir: str = "data/external/prices",
+    max_attempts_per_method: int = 3,
+    backoff_base_seconds: float = 3.0,
 ) -> pd.Series:
     path = _cache_path(cache_dir, ticker)
     cached = _read_cache(path)
@@ -187,7 +231,13 @@ def get_close_prices(
     if need_fetch:
         fetch_start = start if cached.empty else min(start, cached.index.min())
         fetch_end = effective_end if cached.empty else max(effective_end, cached.index.max())
-        fresh = _download_close_prices(ticker, fetch_start, fetch_end)
+        fresh = _download_close_prices(
+            ticker,
+            fetch_start,
+            fetch_end,
+            max_attempts_per_method=max_attempts_per_method,
+            backoff_base_seconds=backoff_base_seconds,
+        )
         if fresh.empty and cached.empty:
             logger.warning("No market prices returned for %s", ticker)
             return pd.Series(dtype=float)

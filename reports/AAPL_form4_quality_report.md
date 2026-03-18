@@ -1,18 +1,18 @@
 # Data Quality Report
 
-**Generated:** 2026-02-26T20:56:43.639284
+**Generated:** 2026-03-18T21:50:08.930099
 
-**Source:** data/processed/AAPL_form4.csv
+**Source:** DataFrame
 
 ---
 
 ## Dataset Overview
 
-- **Total Rows:** 750
+- **Total Rows:** 1,402
 - **Total Columns:** 31
-- **Memory Usage:** 1.97 MB
-- **Date Range:** 2019-12-27 to 2026-02-01
-- **Duplicate Rows:** 26
+- **Memory Usage:** 3.41 MB
+- **Date Range:** 2016-04-01 to 2026-02-01
+- **Duplicate Rows:** 40
 
 ---
 
@@ -20,26 +20,26 @@
 
 | Column | Type | Count | Missing % | Unique |
 |--------|------|-------|-----------|--------|
-| accession_number | object | 750 | 0.0% | 255 |
-| filing_date | datetime64[ns] | 750 | 0.0% | 100 |
-| issuer_cik | int64 | 750 | 0.0% | 1 |
-| issuer_name | object | 750 | 0.0% | 1 |
-| ticker | object | 750 | 0.0% | 1 |
-| insider_name | object | 750 | 0.0% | 17 |
-| insider_cik | int64 | 750 | 0.0% | 17 |
-| insider_role | object | 750 | 0.0% | 5 |
-| is_director | bool | 750 | 0.0% | 2 |
-| is_officer | bool | 750 | 0.0% | 2 |
-| is_ten_percent_owner | bool | 750 | 0.0% | 1 |
-| officer_title | object | 750 | 22.0% | 6 |
-| has_10b5_1_plan | bool | 750 | 0.0% | 2 |
-| footnote_text | object | 750 | 1.9% | 148 |
-| is_amendment | bool | 750 | 0.0% | 1 |
-| xml_path | object | 750 | 0.0% | 255 |
-| security_title | object | 750 | 0.0% | 3 |
-| transaction_date | datetime64[ns] | 750 | 0.0% | 140 |
-| transaction_code | object | 750 | 0.0% | 5 |
-| shares | float64 | 750 | 0.0% | 401 |
+| accession_number | object | 1,402 | 0.0% | 486 |
+| filing_date | datetime64[ns] | 1,402 | 0.0% | 212 |
+| issuer_cik | object | 1,402 | 0.0% | 1 |
+| issuer_name | object | 1,402 | 0.0% | 2 |
+| ticker | object | 1,402 | 0.0% | 1 |
+| insider_name | object | 1,402 | 0.0% | 25 |
+| insider_cik | object | 1,402 | 0.0% | 25 |
+| insider_role | object | 1,402 | 0.0% | 5 |
+| is_director | bool | 1,402 | 0.0% | 2 |
+| is_officer | bool | 1,402 | 0.0% | 2 |
+| is_ten_percent_owner | bool | 1,402 | 0.0% | 1 |
+| officer_title | object | 1,402 | 19.3% | 8 |
+| has_10b5_1_plan | bool | 1,402 | 0.0% | 2 |
+| footnote_text | object | 1,402 | 2.7% | 300 |
+| is_amendment | bool | 1,402 | 0.0% | 1 |
+| xml_path | object | 1,402 | 0.0% | 486 |
+| security_title | object | 1,402 | 0.0% | 4 |
+| transaction_date | datetime64[ns] | 1,402 | 0.0% | 301 |
+| transaction_code | object | 1,402 | 0.0% | 5 |
+| shares | float64 | 1,402 | 0.0% | 684 |
 
 *... and 11 more columns*
 
@@ -49,14 +49,12 @@
 
 | Column | Mean | Std | Min | Median | Max | Outliers % |
 |--------|------|-----|-----|--------|-----|------------|
-| issuer_cik | 320193.00 | 0.00 | 320193.00 | 320193.00 | 320193.00 | 0.0% |
-| insider_cik | 1473578.34 | 228875.79 | 1051401.00 | 1496686.00 | 2078476.00 | 0.0% |
-| shares | 72582.05 | 296282.49 | 165.00 | 16457.50 | 5040000.00 | 8.8% |
-| price_per_share | 133.09 | 109.78 | 0.00 | 150.00 | 503.43 | 0.0% |
-| total_value | 10142487.02 | 30608974.45 | 27934.50 | 2950875.30 | 397025647.20 | 4.6% |
-| shares_owned_after | 423420.40 | 1000426.05 | 0.00 | 66477.00 | 8319726.00 | 10.0% |
-| conversion_price | 38.90 | 14.20 | 28.86 | 38.90 | 48.95 | 0.0% |
-| underlying_shares | 66697.49 | 293855.25 | 281.00 | 16612.00 | 5040000.00 | 7.2% |
+| shares | 56758.77 | 221835.74 | 100.00 | 16467.50 | 5040000.00 | 5.9% |
+| price_per_share | 120.15 | 98.37 | 0.00 | 142.85 | 503.43 | 1.1% |
+| total_value | 7182652.51 | 22375238.46 | 15576.00 | 2249296.86 | 397025647.20 | 6.3% |
+| shares_owned_after | 301235.57 | 777303.09 | 0.00 | 59064.00 | 8319726.00 | 16.0% |
+| conversion_price | 24.15 | 8.45 | 13.02 | 23.83 | 48.95 | 6.7% |
+| underlying_shares | 55087.74 | 224781.05 | 281.00 | 17656.50 | 5040000.00 | 4.5% |
 
 ---
 
@@ -64,11 +62,11 @@
 
 | Type | Count |
 |------|-------|
-| M | 337 |
-| S | 207 |
-| A | 111 |
-| F | 73 |
-| G | 22 |
+| M | 617 |
+| S | 397 |
+| A | 190 |
+| F | 147 |
+| G | 51 |
 
 ---
 
@@ -76,19 +74,19 @@
 
 | Type | Count |
 |------|-------|
-| Officer | 325 |
-| Director | 165 |
-| CFO | 100 |
-| COO | 88 |
-| CEO | 72 |
+| Officer | 694 |
+| Director | 271 |
+| CFO | 182 |
+| COO | 148 |
+| CEO | 107 |
 
 ---
 
 ## Warnings
 
-- Found 26 duplicate rows (3.5%)
+- Found 40 duplicate rows (2.9%)
 - High missing values (>50%) in: total_value, conversion_price, exercise_date, expiration_date, underlying_shares
-- Constant columns: issuer_cik, issuer_name, ticker, is_ten_percent_owner, is_amendment
+- Constant columns: issuer_cik, ticker, is_ten_percent_owner, is_amendment
 
 ---
 
