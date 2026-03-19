@@ -33,10 +33,10 @@ insider-trading-analysis/
 │   │   ├── extract.py        # SEC EDGAR downloader & parser
 │   │   ├── load.py           # Database loader
 │   │   └── quality.py        # Data quality checks
-│   ├── features/             # Feature engineering (coming soon)
+│   ├── features/             # Feature engineering pipeline
 │   ├── labels/               # Phase 3 labeling pipeline
-│   ├── models/               # ML models (coming soon)
-│   ├── evaluation/           # Metrics & explainability (coming soon)
+│   ├── models/               # Model training pipelines (NB, XGBoost, Isolation Forest)
+│   ├── evaluation/           # Metrics & explainability outputs
 │   └── utils/
 │       ├── config.py         # Configuration loader
 │       └── logger.py         # Logging utilities
@@ -396,11 +396,23 @@ python -m src.labels.calibrate --input data/processed/AAPL_form4_features.csv
 python -m src.data.external_events --tickers AAPL
 ```
 
+For larger ticker batches or when Yahoo Finance rate-limits, use SEC-based earnings source:
+
+```bash
+python -m src.data.external_events \
+  --tickers AAPL,ABBV,AMGN,BA,BIIB,BMY,COP,LMT,MRK,REGN,XOM \
+  --earnings-source sec \
+  --skip-enforcement
+```
+
 **What it does:**
 
-- Fetches historical earnings announcement dates via `yfinance`
+- Fetches historical earnings announcement dates (`--earnings-source auto|sec|yfinance`)
+  - `auto` (default): SEC filings fallback + Yahoo where needed
+  - `sec`: SEC submission filing dates for 10-Q / 10-K forms
+  - `yfinance`: Yahoo Finance earnings calendar only
 - Fetches SEC litigation RSS releases and maps rows to your tickers (when ticker is mentioned)
-- Applies richer enforcement matching using ticker + company-name aliases
+- Applies enforcement matching using ticker + company-name aliases
 - Appends + deduplicates records in external CSVs
 
 **What it updates:**
@@ -411,6 +423,86 @@ python -m src.data.external_events --tickers AAPL
 | `logs/external_events.log` | Ingestion execution log |
 
 Optional: add custom aliases in `data/external/sec/company_aliases.csv` with columns `ticker,alias`.
+
+Useful options:
+
+```bash
+# earnings only
+python -m src.data.external_events --tickers AAPL,MSFT --skip-enforcement --earnings-source sec
+
+# enforcement only
+python -m src.data.external_events --tickers AAPL,MSFT --skip-earnings
+
+# include yfinance alias enrichment for enforcement matching (can be slower / rate-limited)
+python -m src.data.external_events --tickers AAPL,MSFT --include-yf-aliases
+```
+
+---
+
+## 🤖 Model Training & Evaluation (Current)
+
+Model scripts expect time-based split files in `data/processed/train.csv`, `data/processed/val.csv`, and `data/processed/test.csv`.
+
+### 1) Build training splits from labeled datasets
+
+```bash
+python scripts/create_splits.py
+```
+
+This reads `data/processed/*_form4_features_labeled.csv` files and writes:
+
+- `data/processed/master_labeled.csv`
+- `data/processed/train.csv` (<= 2022)
+- `data/processed/val.csv` (2023)
+- `data/processed/test.csv` (2024)
+
+### 2) Train Naive Bayes baseline
+
+```bash
+python -m src.models.naive_bayes_model
+```
+
+Outputs:
+
+- `models/naive_bayes_model.joblib`
+- `models/naive_bayes_scaler.joblib`
+- `reports/model_results_naive_bayes.json`
+- `reports/nb_pr_curve.png`
+- `reports/nb_feature_separation.png`
+
+### 3) Train Isolation Forest anomaly model
+
+```bash
+python -m src.models.isolation_forest_model
+```
+
+Outputs:
+
+- `models/isolation_forest_model.joblib`
+- `models/isolation_forest_scaler.joblib`
+- `reports/model_results_isolation_forest.json`
+- `reports/iforest_score_distribution.png`
+- `reports/iforest_feature_importance.png`
+
+### 4) Train XGBoost + SHAP explainability
+
+```bash
+python -m src.models.xgb_model
+```
+
+Outputs:
+
+- `models/xgb_model.joblib`
+- `models/xgb_scaler.joblib`
+- `reports/model_results_xgb.json`
+- `reports/shap_xgb.png`
+- `reports/shap_xgb_beeswarm.png`
+
+### Notes
+
+- All three model scripts automatically filter to open-market transactions (`P`, `S`) and supervised labels (`final_label` in `{0,1}`) where required.
+- Feature leakage checks run before training; training aborts if leakage columns are accidentally included.
+- Run with Python 3.11/3.12 to avoid package-compatibility issues.
 
 ---
 

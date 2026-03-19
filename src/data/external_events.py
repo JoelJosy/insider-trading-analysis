@@ -48,6 +48,32 @@ _KNOWN_COMPANY_ALIASES: dict[str, list[str]] = {
     "V": ["visa", "visa inc"],
 }
 
+_EARNINGS_SEC_FORMS = {"10-Q", "10-K", "10-Q/A", "10-K/A"}
+
+_KNOWN_TICKER_CIKS: dict[str, str] = {
+    "AAPL": "0000320193",
+    "ABBV": "0001551152",
+    "AMGN": "0000318154",
+    "BA": "0000012927",
+    "BAC": "0000070858",
+    "BIIB": "0000875045",
+    "BMY": "0000014272",
+    "COP": "0001163165",
+    "GS": "0000886982",
+    "JPM": "0000019617",
+    "LLY": "0000059478",
+    "LMT": "0000936468",
+    "META": "0001326801",
+    "MRK": "0000310158",
+    "MRNA": "0001682852",
+    "MS": "0000895421",
+    "PFE": "0000078003",
+    "REGN": "0000872589",
+    "WFC": "0000072971",
+    "WMT": "0000104169",
+    "XOM": "0000034088",
+}
+
 
 def _normalize_tickers(tickers: list[str]) -> list[str]:
     return sorted({t.strip().upper() for t in tickers if t and t.strip()})
@@ -93,7 +119,11 @@ def _fetch_company_aliases_from_yf(ticker: str) -> set[str]:
     return {a for a in alias_set if a}
 
 
-def _build_alias_map(tickers: list[str], alias_csv_path: str | None = None) -> dict[str, set[str]]:
+def _build_alias_map(
+    tickers: list[str],
+    alias_csv_path: str | None = None,
+    include_yf_aliases: bool = False,
+) -> dict[str, set[str]]:
     alias_map = {t: set() for t in tickers}
     custom = _load_aliases_csv(alias_csv_path, tickers) if alias_csv_path else {t: set() for t in tickers}
 
@@ -102,7 +132,8 @@ def _build_alias_map(tickers: list[str], alias_csv_path: str | None = None) -> d
         for a in _KNOWN_COMPANY_ALIASES.get(ticker, []):
             alias_map[ticker].add(_normalize_text(a))
         alias_map[ticker].update(custom.get(ticker, set()))
-        alias_map[ticker].update(_fetch_company_aliases_from_yf(ticker))
+        if include_yf_aliases:
+            alias_map[ticker].update(_fetch_company_aliases_from_yf(ticker))
 
         # prune tiny aliases that are likely noisy
         alias_map[ticker] = {a for a in alias_map[ticker] if len(a) >= 3}
@@ -157,14 +188,126 @@ def _fetch_earnings_for_ticker(ticker: str, max_rows: int = 40) -> list[dict]:
     return []
 
 
+def _sec_headers() -> dict[str, str]:
+    configured_ua = str(get_config().sec_edgar.user_agent or "").strip()
+    user_agent = configured_ua if "@" in configured_ua else "insider-trading-analysis/1.0 (research@local.invalid)"
+    return {
+        "User-Agent": user_agent,
+        "Accept": "application/json,text/plain,*/*",
+    }
+
+
+def _fetch_sec_json(url: str, headers: dict[str, str], timeout: int = 30, retries: int = 3) -> dict:
+    for attempt in range(1, retries + 1):
+        try:
+            r = requests.get(url, headers=headers, timeout=timeout)
+            if r.status_code == 200:
+                return r.json()
+            logger.warning("SEC request failed (%s): HTTP %s", url, r.status_code)
+        except Exception as e:
+            logger.warning("SEC request error (%s) attempt %d/%d: %s", url, attempt, retries, e)
+        time.sleep(attempt)
+    return {}
+
+
+def _fetch_sec_ticker_cik_map(headers: dict[str, str]) -> dict[str, str]:
+    payload = _fetch_sec_json("https://www.sec.gov/files/company_tickers.json", headers=headers)
+    if not payload:
+        return dict(_KNOWN_TICKER_CIKS)
+
+    out: dict[str, str] = {}
+    for _, v in payload.items():
+        if not isinstance(v, dict):
+            continue
+        ticker = str(v.get("ticker", "")).strip().upper()
+        cik_raw = v.get("cik_str")
+        if not ticker or cik_raw is None:
+            continue
+        try:
+            cik = str(int(cik_raw)).zfill(10)
+        except Exception:
+            continue
+        out[ticker] = cik
+    out.update(_KNOWN_TICKER_CIKS)
+    return out
+
+
+def _fetch_earnings_from_sec_filings(
+    ticker: str,
+    max_rows: int,
+    headers: dict[str, str],
+    ticker_cik_map: dict[str, str],
+) -> list[dict]:
+    cik = ticker_cik_map.get(ticker.upper())
+    if not cik:
+        return []
+
+    url = f"https://data.sec.gov/submissions/CIK{cik}.json"
+    payload = _fetch_sec_json(url, headers=headers)
+    if not payload:
+        return []
+
+    recent = (payload.get("filings") or {}).get("recent") or {}
+    forms = recent.get("form") or []
+    dates = recent.get("filingDate") or []
+    if not forms or not dates:
+        return []
+
+    rows: list[dict] = []
+    for form, filing_date in zip(forms, dates):
+        f = str(form or "").upper().strip()
+        if f not in _EARNINGS_SEC_FORMS:
+            continue
+        d = pd.to_datetime(filing_date, errors="coerce")
+        if pd.isna(d):
+            continue
+        rows.append({"ticker": ticker, "announcement_date": d.date().isoformat()})
+        if len(rows) >= max_rows:
+            break
+
+    return rows
+
+
 def build_earnings_csv(
     tickers: list[str],
     out_path: str = "data/external/earnings/earnings_announcements.csv",
     max_rows_per_ticker: int = 40,
+    source: str = "auto",
 ) -> pd.DataFrame:
+    source = (source or "auto").lower()
+    if source not in {"auto", "yfinance", "sec"}:
+        raise ValueError(f"Unknown earnings source: {source}")
+
     rows = []
+    sec_headers = _sec_headers()
+    sec_ticker_cik_map: dict[str, str] = {}
+    sec_map_loaded = False
+
+    def _get_sec_map() -> dict[str, str]:
+        nonlocal sec_ticker_cik_map, sec_map_loaded
+        if not sec_map_loaded:
+            sec_ticker_cik_map = _fetch_sec_ticker_cik_map(sec_headers)
+            sec_map_loaded = True
+        return sec_ticker_cik_map
+
     for ticker in tickers:
-        rows.extend(_fetch_earnings_for_ticker(ticker, max_rows=max_rows_per_ticker))
+        ticker_rows: list[dict] = []
+
+        if source in {"auto", "sec"}:
+            ticker_rows = _fetch_earnings_from_sec_filings(
+                ticker=ticker,
+                max_rows=max_rows_per_ticker,
+                headers=sec_headers,
+                ticker_cik_map=_get_sec_map(),
+            )
+
+        if not ticker_rows and source in {"auto", "yfinance"}:
+            ticker_rows = _fetch_earnings_for_ticker(ticker, max_rows=max_rows_per_ticker)
+
+        if not ticker_rows:
+            logger.warning("No earnings dates found for %s using source=%s", ticker, source)
+
+        rows.extend(ticker_rows)
 
     existing = _read_existing(out_path, ["ticker", "announcement_date"])
     incoming = pd.DataFrame(rows, columns=["ticker", "announcement_date"])
@@ -213,6 +356,7 @@ def build_enforcement_csv(
     out_path: str = "data/external/sec/sec_enforcement.csv",
     rss_url: str = "https://www.sec.gov/rss/litigation/litreleases.xml",
     alias_csv_path: str | None = "data/external/sec/company_aliases.csv",
+    include_yf_aliases: bool = False,
 ) -> pd.DataFrame:
     headers = {
         "User-Agent": get_config().sec_edgar.user_agent,
@@ -245,7 +389,11 @@ def build_enforcement_csv(
     root = ET.fromstring(response.content)
     items = root.findall("./channel/item")
     rows: list[dict] = []
-    alias_map = _build_alias_map(tickers, alias_csv_path=alias_csv_path)
+    alias_map = _build_alias_map(
+        tickers,
+        alias_csv_path=alias_csv_path,
+        include_yf_aliases=include_yf_aliases,
+    )
 
     for item in items:
         title = (item.findtext("title") or "").strip()
@@ -297,12 +445,23 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--skip-earnings", action="store_true", help="Skip earnings ingestion")
     p.add_argument("--skip-enforcement", action="store_true", help="Skip SEC enforcement ingestion")
     p.add_argument("--max-earnings-rows", type=int, default=40)
+    p.add_argument(
+        "--earnings-source",
+        choices=["auto", "sec", "yfinance"],
+        default="auto",
+        help="Earnings source: auto (SEC fallback to Yahoo), sec, or yfinance",
+    )
     p.add_argument("--earnings-out", default="data/external/earnings/earnings_announcements.csv")
     p.add_argument("--enforcement-out", default="data/external/sec/sec_enforcement.csv")
     p.add_argument(
         "--alias-csv",
         default="data/external/sec/company_aliases.csv",
         help="Optional CSV with columns: ticker,alias for enforcement matching",
+    )
+    p.add_argument(
+        "--include-yf-aliases",
+        action="store_true",
+        help="Include company aliases fetched from yfinance (slower and can be rate-limited)",
     )
     return p.parse_args()
 
@@ -322,6 +481,7 @@ if __name__ == "__main__":
             tickers=tickers,
             out_path=args.earnings_out,
             max_rows_per_ticker=args.max_earnings_rows,
+            source=args.earnings_source,
         )
         print(f"Earnings rows: {len(edf):,} -> {args.earnings_out}")
 
@@ -330,6 +490,7 @@ if __name__ == "__main__":
             tickers=tickers,
             out_path=args.enforcement_out,
             alias_csv_path=args.alias_csv,
+            include_yf_aliases=args.include_yf_aliases,
         )
         print(f"Enforcement rows: {len(sdf):,} -> {args.enforcement_out}")
 
