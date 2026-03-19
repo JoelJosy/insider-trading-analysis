@@ -48,10 +48,10 @@ quality_error.txt
 *.pickle
 *.pkl
 
-# Models (trained models can be large)
-models/*.pth
-models/*.pkl
-models/*.joblib
+# # Models (trained models can be large)
+# models/*.pth
+# models/*.pkl
+# models/*.joblib
 
 # Jupyter
 .ipynb_checkpoints/
