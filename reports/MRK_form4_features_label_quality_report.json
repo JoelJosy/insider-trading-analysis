@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T22:57:41.516699",
+  "generated_at": "2026-03-19T12:13:43.109344",
   "input_csv": "data/processed/MRK_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,15 +28,15 @@
   },
   "signals": {
     "price_signal_rows": 74,
-    "earnings_signal_rows": 0,
+    "earnings_signal_rows": 368,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 382,
-      "1": 74
+      "0": 72,
+      "1": 326,
+      "2": 58
     }
   },
   "recommendations": [
-    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }

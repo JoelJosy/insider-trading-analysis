@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T22:40:13.918005",
+  "generated_at": "2026-03-19T12:13:37.843961",
   "input_csv": "data/processed/COP_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,15 +28,15 @@
   },
   "signals": {
     "price_signal_rows": 238,
-    "earnings_signal_rows": 0,
+    "earnings_signal_rows": 744,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 708,
-      "1": 238
+      "0": 153,
+      "1": 604,
+      "2": 189
     }
   },
   "recommendations": [
-    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }

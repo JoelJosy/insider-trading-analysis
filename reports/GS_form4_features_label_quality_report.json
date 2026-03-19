@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T23:04:06.139052",
+  "generated_at": "2026-03-19T12:13:40.406776",
   "input_csv": "data/processed/GS_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,16 +28,16 @@
   },
   "signals": {
     "price_signal_rows": 119,
-    "earnings_signal_rows": 0,
+    "earnings_signal_rows": 220,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 592,
-      "1": 119
+      "0": 378,
+      "1": 327,
+      "2": 6
     }
   },
   "recommendations": [
     "Price coverage is below 90%; re-run labeling later or verify market source access.",
-    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T22:55:55.656005",
+  "generated_at": "2026-03-19T12:13:46.441845",
   "input_csv": "data/processed/WMT_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,15 +28,15 @@
   },
   "signals": {
     "price_signal_rows": 76,
-    "earnings_signal_rows": 0,
+    "earnings_signal_rows": 633,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 712,
-      "1": 76
+      "0": 134,
+      "1": 599,
+      "2": 55
     }
   },
   "recommendations": [
-    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }

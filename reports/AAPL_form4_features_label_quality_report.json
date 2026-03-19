@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T22:32:18.802616",
+  "generated_at": "2026-03-19T12:13:34.208015",
   "input_csv": "data/processed/AAPL_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,12 +28,12 @@
   },
   "signals": {
     "price_signal_rows": 273,
-    "earnings_signal_rows": 1111,
+    "earnings_signal_rows": 1184,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 207,
-      "1": 926,
-      "2": 229
+      "0": 152,
+      "1": 963,
+      "2": 247
     }
   },
   "recommendations": [

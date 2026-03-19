@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T23:03:52.390866",
+  "generated_at": "2026-03-19T12:13:35.270094",
   "input_csv": "data/processed/AMGN_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,15 +28,15 @@
   },
   "signals": {
     "price_signal_rows": 152,
-    "earnings_signal_rows": 0,
+    "earnings_signal_rows": 567,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 473,
-      "1": 152
+      "0": 56,
+      "1": 419,
+      "2": 150
     }
   },
   "recommendations": [
-    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }

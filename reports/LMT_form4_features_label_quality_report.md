@@ -1,6 +1,6 @@
 # Phase 3 Label Quality Report
 
-**Generated:** 2026-03-18T23:04:35.380175
+**Generated:** 2026-03-19T12:13:42.010981
 
 **Input CSV:** data/processed/LMT_form4_features.csv
 
@@ -17,15 +17,15 @@
 
 ## Signal Counts
 - Price signal rows: 212
-- Earnings signal rows: 0
+- Earnings signal rows: 772
 - Enforcement signal rows: 0
 
 ### Source Count Distribution
 | Source Count | Rows |
 |---|---:|
-| 0 | 943 |
-| 1 | 212 |
+| 0 | 320 |
+| 1 | 686 |
+| 2 | 149 |
 
 ## Recommendations
-- No earnings confirmations found; provide earnings CSV to improve multi-source labeling.
 - No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels.

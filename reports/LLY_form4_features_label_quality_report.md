@@ -1,6 +1,6 @@
 # Phase 3 Label Quality Report
 
-**Generated:** 2026-03-18T22:58:09.624544
+**Generated:** 2026-03-19T12:13:41.477947
 
 **Input CSV:** data/processed/LLY_form4_features.csv
 
@@ -17,16 +17,16 @@
 
 ## Signal Counts
 - Price signal rows: 280
-- Earnings signal rows: 0
+- Earnings signal rows: 1151
 - Enforcement signal rows: 0
 
 ### Source Count Distribution
 | Source Count | Rows |
 |---|---:|
-| 0 | 1130 |
-| 1 | 280 |
+| 0 | 193 |
+| 1 | 1003 |
+| 2 | 214 |
 
 ## Recommendations
 - Opportunistic share is high (>40%); review Cohen/plan rules for over-sensitive labeling.
-- No earnings confirmations found; provide earnings CSV to improve multi-source labeling.
 - No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels.

@@ -1,6 +1,6 @@
 # Phase 3 Label Quality Report
 
-**Generated:** 2026-03-18T23:05:12.977593
+**Generated:** 2026-03-19T12:13:45.874798
 
 **Input CSV:** data/processed/WFC_form4_features.csv
 
@@ -17,15 +17,15 @@
 
 ## Signal Counts
 - Price signal rows: 305
-- Earnings signal rows: 0
+- Earnings signal rows: 240
 - Enforcement signal rows: 0
 
 ### Source Count Distribution
 | Source Count | Rows |
 |---|---:|
-| 0 | 883 |
-| 1 | 305 |
+| 0 | 695 |
+| 1 | 441 |
+| 2 | 52 |
 
 ## Recommendations
-- No earnings confirmations found; provide earnings CSV to improve multi-source labeling.
 - No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels.

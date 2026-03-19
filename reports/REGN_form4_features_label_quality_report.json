@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T22:56:54.460873",
+  "generated_at": "2026-03-19T12:13:45.323557",
   "input_csv": "data/processed/REGN_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,15 +28,15 @@
   },
   "signals": {
     "price_signal_rows": 722,
-    "earnings_signal_rows": 0,
+    "earnings_signal_rows": 1864,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 2534,
-      "1": 722
+      "0": 1070,
+      "1": 1786,
+      "2": 400
     }
   },
   "recommendations": [
-    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }

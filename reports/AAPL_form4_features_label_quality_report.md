@@ -1,6 +1,6 @@
 # Phase 3 Label Quality Report
 
-**Generated:** 2026-03-18T22:32:18.802616
+**Generated:** 2026-03-19T12:13:34.208015
 
 **Input CSV:** data/processed/AAPL_form4_features.csv
 
@@ -17,15 +17,15 @@
 
 ## Signal Counts
 - Price signal rows: 273
-- Earnings signal rows: 1111
+- Earnings signal rows: 1184
 - Enforcement signal rows: 0
 
 ### Source Count Distribution
 | Source Count | Rows |
 |---|---:|
-| 0 | 207 |
-| 1 | 926 |
-| 2 | 229 |
+| 0 | 152 |
+| 1 | 963 |
+| 2 | 247 |
 
 ## Recommendations
 - No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels.

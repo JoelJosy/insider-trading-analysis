@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T22:39:36.982290",
+  "generated_at": "2026-03-19T12:13:42.542024",
   "input_csv": "data/processed/META_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,16 +28,16 @@
   },
   "signals": {
     "price_signal_rows": 893,
-    "earnings_signal_rows": 0,
+    "earnings_signal_rows": 2561,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 2774,
-      "1": 893
+      "0": 873,
+      "1": 2134,
+      "2": 660
     }
   },
   "recommendations": [
     "Opportunistic share is very low (<1%); review Cohen/plan rules for over-conservative labeling.",
-    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }

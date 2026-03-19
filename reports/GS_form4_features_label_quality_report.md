@@ -1,6 +1,6 @@
 # Phase 3 Label Quality Report
 
-**Generated:** 2026-03-18T23:04:06.139052
+**Generated:** 2026-03-19T12:13:40.406776
 
 **Input CSV:** data/processed/GS_form4_features.csv
 
@@ -17,16 +17,16 @@
 
 ## Signal Counts
 - Price signal rows: 119
-- Earnings signal rows: 0
+- Earnings signal rows: 220
 - Enforcement signal rows: 0
 
 ### Source Count Distribution
 | Source Count | Rows |
 |---|---:|
-| 0 | 592 |
-| 1 | 119 |
+| 0 | 378 |
+| 1 | 327 |
+| 2 | 6 |
 
 ## Recommendations
 - Price coverage is below 90%; re-run labeling later or verify market source access.
-- No earnings confirmations found; provide earnings CSV to improve multi-source labeling.
 - No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels.

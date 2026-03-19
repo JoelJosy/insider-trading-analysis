@@ -1,6 +1,6 @@
 # Phase 3 Label Quality Report
 
-**Generated:** 2026-03-18T22:57:41.516699
+**Generated:** 2026-03-19T12:13:43.109344
 
 **Input CSV:** data/processed/MRK_form4_features.csv
 
@@ -17,15 +17,15 @@
 
 ## Signal Counts
 - Price signal rows: 74
-- Earnings signal rows: 0
+- Earnings signal rows: 368
 - Enforcement signal rows: 0
 
 ### Source Count Distribution
 | Source Count | Rows |
 |---|---:|
-| 0 | 382 |
-| 1 | 74 |
+| 0 | 72 |
+| 1 | 326 |
+| 2 | 58 |
 
 ## Recommendations
-- No earnings confirmations found; provide earnings CSV to improve multi-source labeling.
 - No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels.

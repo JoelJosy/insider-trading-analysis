@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T23:04:19.364744",
+  "generated_at": "2026-03-19T12:13:35.784110",
   "input_csv": "data/processed/BA_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,15 +28,15 @@
   },
   "signals": {
     "price_signal_rows": 141,
-    "earnings_signal_rows": 0,
+    "earnings_signal_rows": 489,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 416,
-      "1": 141
+      "0": 51,
+      "1": 382,
+      "2": 124
     }
   },
   "recommendations": [
-    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }

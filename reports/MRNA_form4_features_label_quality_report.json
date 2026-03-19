@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-18T22:57:26.498830",
+  "generated_at": "2026-03-19T12:13:43.693674",
   "input_csv": "data/processed/MRNA_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,15 +28,15 @@
   },
   "signals": {
     "price_signal_rows": 1033,
-    "earnings_signal_rows": 0,
+    "earnings_signal_rows": 1770,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 1421,
-      "1": 1033
+      "0": 383,
+      "1": 1339,
+      "2": 732
     }
   },
   "recommendations": [
-    "No earnings confirmations found; provide earnings CSV to improve multi-source labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }
