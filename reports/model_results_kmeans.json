@@ -1,0 +1,110 @@
+{
+  "model": "kmeans",
+  "auc_pr": 0.5119737832606159,
+  "f1": 0.40170212765957447,
+  "precision": 0.4591439688715953,
+  "recall": 0.35703479576399394,
+  "confusion_matrix": [
+    [
+      1780,
+      278
+    ],
+    [
+      425,
+      236
+    ]
+  ],
+  "n_clusters": 6,
+  "suspicious_cluster": 5,
+  "cluster_profiles": [
+    {
+      "kmeans_cluster": 0,
+      "insider_total_trades": 34.25229357798165,
+      "insider_avg_trade_value": 2357174.2873318773,
+      "insider_buy_sell_ratio": 0.0,
+      "insider_tenure_days": 1115.665137614679,
+      "role_seniority": 3.874923547400612,
+      "trade_frequency_90d": 0.06478378170119532,
+      "pct_position_traded": 0.1544090433587985,
+      "buy_count_90d": 1.6052511457905478,
+      "sell_count_90d": 1.0488628744094501,
+      "informed_rate": 0.5931372549019608
+    },
+    {
+      "kmeans_cluster": 1,
+      "insider_total_trades": 580.6,
+      "insider_avg_trade_value": 24050049.476892836,
+      "insider_buy_sell_ratio": 0.0,
+      "insider_tenure_days": 1357.6,
+      "role_seniority": 2.6,
+      "trade_frequency_90d": 1.1179027314596222,
+      "pct_position_traded": 0.14217085452225603,
+      "buy_count_90d": 20.5850710716751,
+      "sell_count_90d": 29.658016632740292,
+      "informed_rate": 0.08775731310942579
+    },
+    {
+      "kmeans_cluster": 2,
+      "insider_total_trades": 61.093023255813954,
+      "insider_avg_trade_value": 2170648.095277642,
+      "insider_buy_sell_ratio": 0.0,
+      "insider_tenure_days": 2103.5348837209303,
+      "role_seniority": 1.6690944714200528,
+      "trade_frequency_90d": 0.08266677692778729,
+      "pct_position_traded": 0.19796732606822898,
+      "buy_count_90d": 1.701057013348862,
+      "sell_count_90d": 1.7957577547344,
+      "informed_rate": 0.376140350877193
+    },
+    {
+      "kmeans_cluster": 3,
+      "insider_total_trades": 1053.0,
+      "insider_avg_trade_value": 1034047.1819131474,
+      "insider_buy_sell_ratio": 0.0,
+      "insider_tenure_days": 1583.0,
+      "role_seniority": 6.0,
+      "trade_frequency_90d": 3.268860450944546,
+      "pct_position_traded": 0.0011667292510335876,
+      "buy_count_90d": 28.548446069469836,
+      "sell_count_90d": 112.92321755027422,
+      "informed_rate": 0.0
+    },
+    {
+      "kmeans_cluster": 4,
+      "insider_total_trades": 42.0,
+      "insider_avg_trade_value": 2844654.189815521,
+      "insider_buy_sell_ratio": 0.0,
+      "insider_tenure_days": 1564.2272727272727,
+      "role_seniority": 3.6575757575757577,
+      "trade_frequency_90d": 0.07056918390251721,
+      "pct_position_traded": 0.8001511855673994,
+      "buy_count_90d": 2.2754689754689754,
+      "sell_count_90d": 0.6962481962481962,
+      "informed_rate": 0.9558823529411765
+    },
+    {
+      "kmeans_cluster": 5,
+      "insider_total_trades": 4.0,
+      "insider_avg_trade_value": 2942619338.8237,
+      "insider_buy_sell_ratio": 0.0,
+      "insider_tenure_days": 92.0,
+      "role_seniority": 1.0,
+      "trade_frequency_90d": 0.0222222222222222,
+      "pct_position_traded": 0.5409944838799774,
+      "buy_count_90d": 0.0,
+      "sell_count_90d": 1.0,
+      "informed_rate": 1.0
+    }
+  ],
+  "feature_columns_used": [
+    "insider_total_trades",
+    "insider_avg_trade_value",
+    "insider_buy_sell_ratio",
+    "insider_tenure_days",
+    "role_seniority",
+    "trade_frequency_90d",
+    "pct_position_traded",
+    "buy_count_90d",
+    "sell_count_90d"
+  ]
+}
