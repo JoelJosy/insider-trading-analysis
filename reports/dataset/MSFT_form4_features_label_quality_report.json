@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-03-20T11:33:47.201928",
+  "input_csv": "data/processed/MSFT_form4_features.csv",
+  "params": {
+    "horizon_days": 30,
+    "benchmark_ticker": "SPY",
+    "abnormal_threshold": 0.05,
+    "confidence_sources_required": 2,
+    "earnings_proximity_days": 30,
+    "earnings_csv": "data/external/earnings/earnings_announcements.csv",
+    "enforcement_csv": "data/external/sec/sec_enforcement.csv",
+    "enforcement_lookahead_days": 365
+  },
+  "rows": 1268,
+  "coverage": {
+    "forward_return_rows": 1268,
+    "forward_return_pct": 100.0,
+    "benchmark_return_rows": 1268,
+    "benchmark_return_pct": 100.0
+  },
+  "labels": {
+    "opportunistic_rows": 160,
+    "opportunistic_pct": 12.62,
+    "routine_rows": 62,
+    "routine_pct": 4.89,
+    "uncertain_rows": 1046,
+    "uncertain_pct": 82.49
+  },
+  "signals": {
+    "price_signal_rows": 98,
+    "earnings_signal_rows": 225,
+    "enforcement_signal_rows": 0,
+    "label_source_count_distribution": {
+      "0": 971,
+      "1": 271,
+      "2": 26
+    }
+  },
+  "recommendations": [
+    "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
+  ]
+}

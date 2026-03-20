@@ -2,6 +2,7 @@ import re
 import time
 import xml.etree.ElementTree as ET
 import os
+import random
 from dataclasses import dataclass, field
 from datetime import datetime, date
 from pathlib import Path
@@ -281,16 +282,49 @@ class SECEdgarDownloader:
         self.app_name = os.getenv("SEC_EDGAR_APP_NAME", "InsiderTradingAnalysis")
         self.contact_email = os.getenv("SEC_EDGAR_CONTACT_EMAIL", "joeljosy449@gmail.com")
         self.max_retries = int(os.getenv("SEC_EDGAR_MAX_RETRIES", "5"))
-        self.base_backoff_seconds = float(os.getenv("SEC_EDGAR_BACKOFF_SECONDS", "2"))
+        self.base_backoff_seconds = float(os.getenv("SEC_EDGAR_BACKOFF_SECONDS", "1.5"))
+        self.max_backoff_seconds = float(os.getenv("SEC_EDGAR_MAX_BACKOFF_SECONDS", "30"))
+        self.skip_if_exists = os.getenv("SEC_EDGAR_SKIP_IF_EXISTS", "1") == "1"
+        self.min_rate_limit_per_second = float(os.getenv("SEC_EDGAR_MIN_RATE_LIMIT_PER_SECOND", "1.5"))
+        self._base_rate_limit_per_second = float(self.config.sec_edgar.rate_limit_per_second)
+        self._effective_rate_limit_per_second = self._base_rate_limit_per_second
 
     @staticmethod
     def _is_retryable_error(error: Exception) -> bool:
         message = str(error).lower()
-        retry_markers = ("429", "500", "502", "503", "504", "timeout", "temporar", "connection")
+        retry_markers = (
+            "429", "500", "502", "503", "504",
+            "timeout", "temporar", "connection",
+            "ssl", "unexpected_eof_while_reading", "eof occurred in violation of protocol",
+            "max retries exceeded", "service unavailable",
+        )
         return any(marker in message for marker in retry_markers)
 
+    def _has_existing_filings(self, ticker: str) -> bool:
+        base = self.download_dir / "sec-edgar-filings" / ticker / "4"
+        if not base.exists():
+            return False
+        return any(p.is_dir() for p in base.iterdir())
+
+    def _compute_backoff(self, attempt: int) -> float:
+        exp = self.base_backoff_seconds * (2 ** (attempt - 1))
+        jitter = random.uniform(0, self.base_backoff_seconds)
+        return min(self.max_backoff_seconds, exp + jitter)
+
+    def _adjust_rate_limit_on_retry(self):
+        self._effective_rate_limit_per_second = max(
+            self.min_rate_limit_per_second,
+            self._effective_rate_limit_per_second * 0.7,
+        )
+
+    def _recover_rate_limit_on_success(self):
+        self._effective_rate_limit_per_second = min(
+            self._base_rate_limit_per_second,
+            self._effective_rate_limit_per_second * 1.05,
+        )
+
     def _throttle(self):
-        interval = 1.0 / self.config.sec_edgar.rate_limit_per_second
+        interval = 1.0 / self._effective_rate_limit_per_second
         elapsed = time.time() - self._last_request
         if elapsed < interval:
             time.sleep(interval - elapsed)
@@ -301,21 +335,27 @@ class SECEdgarDownloader:
         cfg = self.config.sec_edgar
         dl = Downloader(self.app_name, self.contact_email, download_folder=str(self.download_dir))
 
+        if self.skip_if_exists and self._has_existing_filings(ticker):
+            self.logger.info(f"Existing filings found for {ticker}; skipping download")
+            return self.download_dir / ticker
+
         last_error: Optional[Exception] = None
         for attempt in range(1, self.max_retries + 1):
             try:
                 self._throttle()
                 dl.get("4", ticker, after=start_date or cfg.start_date, before=end_date or cfg.end_date, limit=limit)
+                self._recover_rate_limit_on_success()
                 self.logger.info(f"Downloaded Form 4 filings for {ticker}")
                 return self.download_dir / ticker
             except Exception as e:
                 last_error = e
                 if attempt >= self.max_retries or not self._is_retryable_error(e):
                     break
-                backoff = self.base_backoff_seconds * (2 ** (attempt - 1))
+                self._adjust_rate_limit_on_retry()
+                backoff = self._compute_backoff(attempt)
                 self.logger.warning(
                     f"SEC download failed for {ticker} (attempt {attempt}/{self.max_retries}): {e}. "
-                    f"Retrying in {backoff:.1f}s"
+                    f"Retrying in {backoff:.1f}s at {self._effective_rate_limit_per_second:.2f} req/s"
                 )
                 time.sleep(backoff)
 
@@ -398,8 +438,11 @@ def download_and_parse_ticker(
     output_dir: str = "data/processed",
     num_filings: int = 1000,
     enrich_market_prices: bool = True,
+    force_refresh: bool = False,
 ) -> Tuple[Optional[Path], pd.DataFrame]:
     dl = SECEdgarDownloader(download_dir)
+    if force_refresh:
+        dl.skip_if_exists = False
     dl.download(ticker, limit=num_filings)
     xml_files = dl.find_files(ticker)
     if not xml_files:
@@ -427,6 +470,7 @@ if __name__ == "__main__":
     p.add_argument("--download-dir", default="data/raw")
     p.add_argument("--output-dir", default="data/processed")
     p.add_argument("--skip-market-prices", action="store_true", help="Skip yfinance close-price enrichment")
+    p.add_argument("--refresh", action="store_true", help="Force SEC re-download even if local filings exist")
     args = p.parse_args()
     csv_path, df = download_and_parse_ticker(
         args.ticker,
@@ -434,6 +478,7 @@ if __name__ == "__main__":
         args.output_dir,
         args.num_filings,
         enrich_market_prices=not args.skip_market_prices,
+        force_refresh=args.refresh,
     )
     if not df.empty:
         print(f"Parsed {len(df)} transactions -> {csv_path}")

@@ -203,6 +203,22 @@ To skip market-price enrichment (offline or faster parsing):
 python -m src.data.extract --ticker AAPL --num-filings 500 --skip-market-prices
 ```
 
+To force a fresh SEC re-download (ignore local cached filings):
+
+```bash
+python -m src.data.extract --ticker AAPL --num-filings 500 --refresh
+```
+
+For faster and more stable SEC pulls during transient `503`/SSL errors, tune these env vars:
+
+```bash
+export SEC_EDGAR_SKIP_IF_EXISTS=1
+export SEC_EDGAR_MAX_RETRIES=6
+export SEC_EDGAR_BACKOFF_SECONDS=1.5
+export SEC_EDGAR_MAX_BACKOFF_SECONDS=30
+export SEC_EDGAR_MIN_RATE_LIMIT_PER_SECOND=1.5
+```
+
 ---
 
 ### Step 2 — Generate quality report _(optional)_
