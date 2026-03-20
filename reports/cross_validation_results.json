@@ -1,0 +1,82 @@
+{
+  "windows": [
+    {
+      "name": "window1",
+      "train_end": 2020,
+      "val_year": 2021,
+      "test_year": 2022,
+      "train_rows": 2427,
+      "val_rows": 981,
+      "test_rows": 1875,
+      "scale_pos_weight": 1.238929889298893,
+      "auc_pr": 0.8728438293502513,
+      "f1": 0.791023842917251,
+      "precision": 0.831858407079646,
+      "recall": 0.7540106951871658,
+      "confusion_matrix": [
+        [
+          1013,
+          114
+        ],
+        [
+          184,
+          564
+        ]
+      ]
+    },
+    {
+      "name": "window2",
+      "train_end": 2021,
+      "val_year": 2022,
+      "test_year": 2023,
+      "train_rows": 3408,
+      "val_rows": 1875,
+      "test_rows": 1325,
+      "scale_pos_weight": 1.4101838755304101,
+      "auc_pr": 0.7807714373434722,
+      "f1": 0.6030330062444246,
+      "precision": 0.7041666666666667,
+      "recall": 0.5273010920436817,
+      "confusion_matrix": [
+        [
+          542,
+          142
+        ],
+        [
+          303,
+          338
+        ]
+      ]
+    },
+    {
+      "name": "window3",
+      "train_end": 2022,
+      "val_year": 2023,
+      "test_year": 2024,
+      "train_rows": 5283,
+      "val_rows": 1325,
+      "test_rows": 3086,
+      "scale_pos_weight": 1.4435707678075855,
+      "auc_pr": 0.6814595041324227,
+      "f1": 0.6089703095388502,
+      "precision": 0.7259036144578314,
+      "recall": 0.5244831338411317,
+      "confusion_matrix": [
+        [
+          1985,
+          182
+        ],
+        [
+          437,
+          482
+        ]
+      ]
+    }
+  ],
+  "summary": {
+    "mean_auc_pr": 0.7783582569420487,
+    "std_auc_pr": 0.07815095463058765,
+    "mean_f1": 0.667675719566842,
+    "std_f1": 0.08725396855598527
+  }
+}
