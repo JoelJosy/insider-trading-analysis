@@ -1,125 +1,125 @@
 {
   "model": "apriori",
-  "auc_pr": 0.2275783795048935,
-  "f1": 0.2825947334617855,
-  "precision": 0.24553571428571427,
-  "recall": 0.3328290468986384,
+  "auc_pr": 0.2809116967312519,
+  "f1": 0.3286460425873845,
+  "precision": 0.2605095541401274,
+  "recall": 0.44504896626768226,
   "confusion_matrix": [
     [
-      1382,
-      676
+      1006,
+      1161
     ],
     [
-      441,
-      220
+      510,
+      409
     ]
   ],
-  "n_rules_found": 15,
+  "n_rules_found": 23,
   "top_rules": [
-    {
-      "antecedents": "coordinated & large_trade & senior_insider",
-      "consequents": "opportunistic",
-      "support": 0.03716121821737916,
-      "confidence": 0.6751269035532995,
-      "lift": 2.303411999825795
-    },
-    {
-      "antecedents": "coordinated & large_trade & sell_transaction & senior_insider",
-      "consequents": "opportunistic",
-      "support": 0.03660240290583962,
-      "confidence": 0.6717948717948717,
-      "lift": 2.292043704627117
-    },
-    {
-      "antecedents": "coordinated & large_dollar & large_trade & senior_insider",
-      "consequents": "opportunistic",
-      "support": 0.032411288069293095,
-      "confidence": 0.6480446927374302,
-      "lift": 2.211012350149917
-    },
-    {
-      "antecedents": "coordinated & large_dollar & large_trade & sell_transaction & senior_insider",
-      "consequents": "opportunistic",
-      "support": 0.03185247275775356,
-      "confidence": 0.6440677966101694,
-      "lift": 2.197443893296279
-    },
     {
       "antecedents": "large_trade & late_filing",
       "consequents": "opportunistic",
-      "support": 0.049175747415479185,
-      "confidence": 0.6285714285714287,
-      "lift": 2.1445730627808803
-    },
-    {
-      "antecedents": "large_trade & senior_insider",
-      "consequents": "opportunistic",
-      "support": 0.07655769768091646,
-      "confidence": 0.5867237687366167,
-      "lift": 2.001796347291088
-    },
-    {
-      "antecedents": "large_trade & late_filing & sell_transaction",
-      "consequents": "opportunistic",
-      "support": 0.038558256496227995,
-      "confidence": 0.575,
-      "lift": 1.961796949475691
-    },
-    {
-      "antecedents": "large_trade & sell_transaction & senior_insider",
-      "consequents": "opportunistic",
-      "support": 0.07152835987706063,
-      "confidence": 0.5739910313901345,
-      "lift": 1.9583545294044724
+      "support": 0.06378951353397691,
+      "confidence": 0.6569200779727096,
+      "lift": 1.605230699319993
     },
     {
       "antecedents": "large_dollar & large_trade & late_filing",
       "consequents": "opportunistic",
-      "support": 0.03213188041352333,
-      "confidence": 0.5665024630541872,
-      "lift": 1.9328048763307302
+      "support": 0.04315729699034639,
+      "confidence": 0.6015831134564644,
+      "lift": 1.4700109104488905
     },
     {
-      "antecedents": "large_dollar & large_trade & senior_insider",
+      "antecedents": "large_trade & late_filing & sell_transaction",
       "consequents": "opportunistic",
-      "support": 0.06370494551550712,
-      "confidence": 0.562962962962963,
-      "lift": 1.9207287363626735
+      "support": 0.04921446148021957,
+      "confidence": 0.599078341013825,
+      "lift": 1.4638903217280468
     },
     {
-      "antecedents": "large_dollar & large_trade & sell_transaction & senior_insider",
+      "antecedents": "coordinated & large_trade & senior_insider",
       "consequents": "opportunistic",
-      "support": 0.06174909192511875,
-      "confidence": 0.5580808080808081,
-      "lift": 1.9040716988762747
+      "support": 0.04126443308726103,
+      "confidence": 0.598901098901099,
+      "lift": 1.4634572180825651
     },
     {
-      "antecedents": "large_dollar & large_trade",
+      "antecedents": "coordinated & large_trade & sell_transaction & senior_insider",
       "consequents": "opportunistic",
-      "support": 0.1271304833752445,
-      "confidence": 0.5278422273781903,
-      "lift": 1.800903080826066
+      "support": 0.04031800113571834,
+      "confidence": 0.594972067039106,
+      "lift": 1.4538563506788145
     },
     {
-      "antecedents": "large_trade",
+      "antecedents": "large_dollar & large_trade & late_filing & sell_transaction",
       "consequents": "opportunistic",
-      "support": 0.16512992455993294,
-      "confidence": 0.5225464190981433,
-      "lift": 1.782834732080319
+      "support": 0.038425137232632973,
+      "confidence": 0.575070821529745,
+      "lift": 1.405226248909178
     },
     {
       "antecedents": "large_dollar & late_filing",
       "consequents": "opportunistic",
-      "support": 0.04526404023470243,
-      "confidence": 0.5159235668789809,
-      "lift": 1.7602387472448737
+      "support": 0.055650198750709826,
+      "confidence": 0.5730994152046783,
+      "lift": 1.400408978041774
     },
     {
-      "antecedents": "large_dollar & large_trade & sell_transaction",
+      "antecedents": "coordinated & large_dollar & large_trade & senior_insider",
       "consequents": "opportunistic",
-      "support": 0.11623358480022353,
-      "confidence": 0.5079365079365079,
-      "lift": 1.732988333560307
+      "support": 0.035964414158622,
+      "confidence": 0.572289156626506,
+      "lift": 1.3984290538657869
+    },
+    {
+      "antecedents": "late_filing",
+      "consequents": "opportunistic",
+      "support": 0.11943971228468674,
+      "confidence": 0.5705244122965643,
+      "lift": 1.394116776208487
+    },
+    {
+      "antecedents": "coordinated & large_dollar & large_trade & sell_transaction & senior_insider",
+      "consequents": "opportunistic",
+      "support": 0.03539655498769639,
+      "confidence": 0.56838905775076,
+      "lift": 1.3888988862614546
+    },
+    {
+      "antecedents": "large_trade",
+      "consequents": "opportunistic",
+      "support": 0.21976149914821125,
+      "confidence": 0.567171470444553,
+      "lift": 1.3859236255127536
+    },
+    {
+      "antecedents": "large_trade & senior_insider",
+      "consequents": "opportunistic",
+      "support": 0.1033503691084611,
+      "confidence": 0.5646328852119958,
+      "lift": 1.379720412846889
+    },
+    {
+      "antecedents": "large_dollar & large_trade",
+      "consequents": "opportunistic",
+      "support": 0.16941131932614045,
+      "confidence": 0.5569383945239578,
+      "lift": 1.3609183803284315
+    },
+    {
+      "antecedents": "large_trade & sell_transaction & senior_insider",
+      "consequents": "opportunistic",
+      "support": 0.09805035017982207,
+      "confidence": 0.556390977443609,
+      "lift": 1.3595807279530927
+    },
+    {
+      "antecedents": "large_dollar & late_filing & sell_transaction",
+      "consequents": "opportunistic",
+      "support": 0.049782320651145184,
+      "confidence": 0.5479166666666667,
+      "lift": 1.3388731498612396
     }
   ]
 }

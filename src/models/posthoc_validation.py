@@ -22,7 +22,7 @@ import pandas as pd
 from scipy import stats
 from sklearn.preprocessing import StandardScaler
 
-ROOT_DIR = Path(__file__).resolve().parents[0]  # adjust if needed
+ROOT_DIR = Path(__file__).resolve().parents[2]  # points to project root
 DATA_DIR = Path("data/processed")
 MODELS_DIR = Path("models")
 REPORTS_DIR = Path("reports")

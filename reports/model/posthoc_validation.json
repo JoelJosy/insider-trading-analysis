@@ -1,0 +1,24 @@
+{
+  "threshold": 0.5,
+  "n_flagged": 661,
+  "n_unflagged": 2425,
+  "signed_abnormal_return": {
+    "flagged_mean": -0.003367,
+    "unflagged_mean": 0.002621,
+    "difference": -0.005989,
+    "t_stat": -2.4099,
+    "p_value": 0.016092,
+    "significant_at_0.05": true
+  },
+  "abnormal_return": {
+    "flagged_mean": 0.003589,
+    "unflagged_mean": -0.002709,
+    "t_stat": 2.4993,
+    "p_value": 0.012568,
+    "significant_at_0.05": true
+  },
+  "earnings_proximity": {
+    "flagged_pct": 54.16,
+    "unflagged_pct": 54.02
+  }
+}
