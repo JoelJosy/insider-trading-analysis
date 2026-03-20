@@ -15,12 +15,12 @@ for TICKER in $TICKERS; do
     echo "========================================="
     
    # Step 1: Download filings + market prices (stooq is default in market.py)
-    # python -m src.data.extract --ticker $TICKER --num-filings 500 --skip-market-prices
-    # if [ ! -f "data/processed/${TICKER}_form4.csv" ]; then
-    #     echo "WARNING: Extract failed for $TICKER, skipping"
-    #     sleep 10
-    #     continue
-    # fi
+    python -m src.data.extract --ticker $TICKER --num-filings 500 --skip-market-prices
+    if [ ! -f "data/processed/${TICKER}_form4.csv" ]; then
+        echo "WARNING: Extract failed for $TICKER, skipping"
+        sleep 10
+        continue
+    fi
     
     # python -m src.data.load --load-csv data/processed/${TICKER}_form4.csv
 
@@ -61,5 +61,4 @@ done
 
 echo "========================================="
 echo "All tickers complete at $(date)"
-echo "Rebuilding master dataset and splits..."
 echo "========================================="
