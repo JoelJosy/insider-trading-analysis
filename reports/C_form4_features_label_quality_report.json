@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-20T13:32:57.162036",
-  "input_csv": "data/processed/AAPL_form4_features.csv",
+  "generated_at": "2026-03-20T13:34:12.904353",
+  "input_csv": "data/processed/C_form4_features.csv",
   "params": {
     "horizon_days": 30,
     "benchmark_ticker": "SPY",
@@ -11,29 +11,28 @@
     "enforcement_csv": "data/external/sec/sec_enforcement.csv",
     "enforcement_lookahead_days": 365
   },
-  "rows": 1362,
+  "rows": 787,
   "coverage": {
-    "forward_return_rows": 1362,
+    "forward_return_rows": 787,
     "forward_return_pct": 100.0,
-    "benchmark_return_rows": 1362,
+    "benchmark_return_rows": 787,
     "benchmark_return_pct": 100.0
   },
   "labels": {
-    "opportunistic_rows": 68,
-    "opportunistic_pct": 4.99,
-    "routine_rows": 329,
-    "routine_pct": 24.16,
-    "uncertain_rows": 965,
-    "uncertain_pct": 70.85
+    "opportunistic_rows": 57,
+    "opportunistic_pct": 7.24,
+    "routine_rows": 0,
+    "routine_pct": 0.0,
+    "uncertain_rows": 730,
+    "uncertain_pct": 92.76
   },
   "signals": {
-    "price_signal_rows": 273,
-    "earnings_signal_rows": 1184,
+    "price_signal_rows": 172,
+    "earnings_signal_rows": 4,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 152,
-      "1": 963,
-      "2": 247
+      "0": 611,
+      "1": 176
     }
   },
   "recommendations": [

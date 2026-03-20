@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-20T13:32:57.162036",
-  "input_csv": "data/processed/AAPL_form4_features.csv",
+  "generated_at": "2026-03-20T13:35:49.596553",
+  "input_csv": "data/processed/LLY_form4_features.csv",
   "params": {
     "horizon_days": 30,
     "benchmark_ticker": "SPY",
@@ -11,32 +11,33 @@
     "enforcement_csv": "data/external/sec/sec_enforcement.csv",
     "enforcement_lookahead_days": 365
   },
-  "rows": 1362,
+  "rows": 1410,
   "coverage": {
-    "forward_return_rows": 1362,
+    "forward_return_rows": 1410,
     "forward_return_pct": 100.0,
-    "benchmark_return_rows": 1362,
+    "benchmark_return_rows": 1410,
     "benchmark_return_pct": 100.0
   },
   "labels": {
-    "opportunistic_rows": 68,
-    "opportunistic_pct": 4.99,
-    "routine_rows": 329,
-    "routine_pct": 24.16,
-    "uncertain_rows": 965,
-    "uncertain_pct": 70.85
+    "opportunistic_rows": 885,
+    "opportunistic_pct": 62.77,
+    "routine_rows": 48,
+    "routine_pct": 3.4,
+    "uncertain_rows": 477,
+    "uncertain_pct": 33.83
   },
   "signals": {
-    "price_signal_rows": 273,
-    "earnings_signal_rows": 1184,
+    "price_signal_rows": 280,
+    "earnings_signal_rows": 1151,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 152,
-      "1": 963,
-      "2": 247
+      "0": 193,
+      "1": 1003,
+      "2": 214
     }
   },
   "recommendations": [
+    "Opportunistic share is high (>40%); review Cohen/plan rules for over-sensitive labeling.",
     "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
   ]
 }
