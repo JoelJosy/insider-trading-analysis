@@ -1,0 +1,16 @@
+antecedents,consequents,support,confidence,lift
+large_trade & late_filing,opportunistic,0.06378951353397691,0.6569200779727096,1.605230699319993
+large_dollar & large_trade & late_filing,opportunistic,0.04315729699034639,0.6015831134564644,1.4700109104488905
+large_trade & late_filing & sell_transaction,opportunistic,0.04921446148021957,0.599078341013825,1.4638903217280468
+coordinated & large_trade & senior_insider,opportunistic,0.04126443308726103,0.598901098901099,1.4634572180825651
+coordinated & large_trade & sell_transaction & senior_insider,opportunistic,0.04031800113571834,0.594972067039106,1.4538563506788145
+large_dollar & large_trade & late_filing & sell_transaction,opportunistic,0.038425137232632973,0.575070821529745,1.405226248909178
+large_dollar & late_filing,opportunistic,0.055650198750709826,0.5730994152046783,1.400408978041774
+coordinated & large_dollar & large_trade & senior_insider,opportunistic,0.035964414158622,0.572289156626506,1.3984290538657869
+late_filing,opportunistic,0.11943971228468674,0.5705244122965643,1.394116776208487
+coordinated & large_dollar & large_trade & sell_transaction & senior_insider,opportunistic,0.03539655498769639,0.56838905775076,1.3888988862614546
+large_trade,opportunistic,0.21976149914821125,0.567171470444553,1.3859236255127536
+large_trade & senior_insider,opportunistic,0.1033503691084611,0.5646328852119958,1.379720412846889
+large_dollar & large_trade,opportunistic,0.16941131932614045,0.5569383945239578,1.3609183803284315
+large_trade & sell_transaction & senior_insider,opportunistic,0.09805035017982207,0.556390977443609,1.3595807279530927
+large_dollar & late_filing & sell_transaction,opportunistic,0.049782320651145184,0.5479166666666667,1.3388731498612396
