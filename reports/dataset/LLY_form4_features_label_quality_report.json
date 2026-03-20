@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19T12:13:41.477947",
+  "generated_at": "2026-03-20T13:35:49.596553",
   "input_csv": "data/processed/LLY_form4_features.csv",
   "params": {
     "horizon_days": 30,

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19T12:13:36.802239",
+  "generated_at": "2026-03-20T13:33:51.814125",
   "input_csv": "data/processed/BIIB_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,12 +28,12 @@
   },
   "signals": {
     "price_signal_rows": 309,
-    "earnings_signal_rows": 1026,
+    "earnings_signal_rows": 1188,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 346,
-      "1": 889,
-      "2": 223
+      "0": 207,
+      "1": 1005,
+      "2": 246
     }
   },
   "recommendations": [

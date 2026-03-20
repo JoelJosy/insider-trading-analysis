@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19T12:13:42.542024",
+  "generated_at": "2026-03-20T13:36:28.331067",
   "input_csv": "data/processed/META_form4_features.csv",
   "params": {
     "horizon_days": 30,

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-20T11:33:47.201928",
+  "generated_at": "2026-03-20T13:37:03.428241",
   "input_csv": "data/processed/MSFT_form4_features.csv",
   "params": {
     "horizon_days": 30,

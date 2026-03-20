@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19T12:13:46.441845",
+  "generated_at": "2026-03-20T13:38:04.584371",
   "input_csv": "data/processed/WMT_form4_features.csv",
   "params": {
     "horizon_days": 30,

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19T12:13:34.208015",
+  "generated_at": "2026-03-20T13:32:57.162036",
   "input_csv": "data/processed/AAPL_form4_features.csv",
   "params": {
     "horizon_days": 30,

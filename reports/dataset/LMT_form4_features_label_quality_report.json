@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19T12:13:42.010981",
+  "generated_at": "2026-03-20T13:35:57.301462",
   "input_csv": "data/processed/LMT_form4_features.csv",
   "params": {
     "horizon_days": 30,
@@ -28,11 +28,11 @@
   },
   "signals": {
     "price_signal_rows": 212,
-    "earnings_signal_rows": 772,
+    "earnings_signal_rows": 791,
     "enforcement_signal_rows": 0,
     "label_source_count_distribution": {
-      "0": 320,
-      "1": 686,
+      "0": 301,
+      "1": 705,
       "2": 149
     }
   },

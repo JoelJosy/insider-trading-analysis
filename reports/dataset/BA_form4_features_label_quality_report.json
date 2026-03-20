@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19T12:13:35.784110",
+  "generated_at": "2026-03-20T13:33:34.310599",
   "input_csv": "data/processed/BA_form4_features.csv",
   "params": {
     "horizon_days": 30,

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-20T11:45:06.473430",
+  "generated_at": "2026-03-20T13:34:40.267470",
   "input_csv": "data/processed/GOOGL_form4_features.csv",
   "params": {
     "horizon_days": 30,
