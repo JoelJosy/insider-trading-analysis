@@ -46,8 +46,8 @@ for TICKER in $TICKERS; do
         --input data/processed/${TICKER}_form4_features.csv \
         --output data/processed/${TICKER}_form4_features_labeled.csv \
         --horizon-days 30 \
-        --focus-ticker "$TICKER" \ 
-        --benchmark SPY 
+        --focus-ticker "$TICKER" \
+        --benchmark SPY
 
     # python -m src.features.pipeline --input data/processed/${TICKER}_form4.csv
     # python -m src.labels.pipeline --input data/processed/${TICKER}_form4_features.csv 

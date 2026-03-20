@@ -1,12 +1,25 @@
 """
-Insider-level features — aggregate statistics computed across the full dataset
-and joined back onto each row.
+Insider-level features — aggregate statistics computed using only
+past trades (expanding window), joined back onto each row.
 
 These capture the historical "profile" of the insider, not just the current
-trade.  Run this BEFORE temporal features so temporal windows can build
+trade. Run this BEFORE temporal features so temporal windows can build
 on top of the enriched frame.
+
+LOOK-AHEAD BIAS FIX (v2):
+The original implementation computed per-insider aggregates from the FULL
+dataset and joined them back to all rows — including early rows. This means
+a trade from 2013 would show insider_total_trades=162 even though those
+future trades hadn't happened yet.
+
+This version uses a strictly expanding window: for each trade, only trades
+that occurred BEFORE that trade's date are used to compute the insider's
+profile. First trades get zeros/defaults since no history exists yet.
 """
 
+from __future__ import annotations
+
+import numpy as np
 import pandas as pd
 
 # Rough seniority score for known officer titles / roles
@@ -44,79 +57,113 @@ def add_role_features(df: pd.DataFrame) -> pd.DataFrame:
     df["role_seniority"] = [
         _seniority_score(r, t) for r, t in zip(df["insider_role"], title)
     ]
-    df["is_ceo"] = (role.str.contains("ceo") | title.str.lower().str.contains("chief executive")).astype(int)
-    df["is_cfo"] = (role.str.contains("cfo") | title.str.lower().str.contains("chief financial")).astype(int)
-    df["is_coo"] = (role.str.contains("coo") | title.str.lower().str.contains("chief operating")).astype(int)
-    df["is_director_only"] = ((role == "director") & (df["is_officer"] == False)).astype(int)  # noqa: E712
+    df["is_ceo"] = (
+        role.str.contains("ceo") | title.str.lower().str.contains("chief executive")
+    ).astype(int)
+    df["is_cfo"] = (
+        role.str.contains("cfo") | title.str.lower().str.contains("chief financial")
+    ).astype(int)
+    df["is_coo"] = (
+        role.str.contains("coo") | title.str.lower().str.contains("chief operating")
+    ).astype(int)
+    df["is_director_only"] = (
+        (role == "director") & (df["is_officer"] == False)  # noqa: E712
+    ).astype(int)
     return df
 
 
-def _compute_insider_aggregates(df: pd.DataFrame) -> pd.DataFrame:
-    """Compute per-insider aggregate stats from the FULL dataset."""
-    # Only count open-market buys/sells for the ratio — exclude awards/taxes
-    om = df[df["is_open_market"] == True].copy()  # noqa: E712
+def _compute_insider_aggregates_rolling(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compute per-insider aggregate stats using ONLY past trades (expanding window).
 
-    buys = (
-        om[om["trade_direction"] == 1]
-        .groupby("insider_cik")["total_value"]
-        .agg(buy_count="count", total_bought=("sum"))
-    )
-    sells = (
-        om[om["trade_direction"] == -1]
-        .groupby("insider_cik")["total_value"]
-        .agg(sell_count="count", total_sold=("sum"))
-    )
+    For each trade at position i, only trades at positions 0..i-1 (strictly
+    earlier dates for the same insider) are used. This eliminates look-ahead
+    bias — early trades get zeros/defaults since no history exists yet.
 
-    # All trades (incl. awards) for total counts
-    # avg_trade_value: only over rows that actually have a dollar value
-    all_trades = df.groupby("insider_cik").agg(
-        total_trades_hist=("accession_number", "count"),
-        first_trade_date=("transaction_date", "min"),
-        last_trade_date=("transaction_date", "max"),
-    )
-    avg_val = (
-        df[df["total_value"].notna() & (df["total_value"] > 0)]
-        .groupby("insider_cik")["total_value"]
-        .mean()
-        .rename("avg_trade_value_hist")
-    )
-    all_trades = all_trades.join(avg_val, how="left")
+    Only open-market trades (is_open_market=True) count toward buy/sell ratio
+    to match the original logic.
+    """
+    df = df.copy()
+    df["transaction_date"] = pd.to_datetime(df["transaction_date"])
 
-    agg = all_trades.join(buys, how="left").join(sells, how="left")
-    agg["buy_count"] = agg["buy_count"].fillna(0).astype(int)
-    agg["sell_count"] = agg["sell_count"].fillna(0).astype(int)
-    agg["total_bought"] = agg["total_bought"].fillna(0)
-    agg["total_sold"] = agg["total_sold"].fillna(0)
+    # Work on a sorted copy, track original index to join back
+    df = df.sort_values(["insider_cik", "transaction_date"]).reset_index(drop=False)
+    original_index_col = "index"  # reset_index creates this column
 
-    denom = (agg["buy_count"] + agg["sell_count"]).replace(0, 1)
-    agg["buy_sell_ratio_hist"] = agg["buy_count"] / denom
+    records = []
 
-    # Approximate insider tenure from data
-    agg["first_trade_date"] = pd.to_datetime(agg["first_trade_date"])
-    agg["last_trade_date"] = pd.to_datetime(agg["last_trade_date"])
-    agg["tenure_days_hist"] = (
-        agg["last_trade_date"] - agg["first_trade_date"]
-    ).dt.days.fillna(0)
+    for insider_cik, group in df.groupby("insider_cik", sort=False):
+        group = group.sort_values("transaction_date").reset_index(drop=True)
 
-    return agg.reset_index()
+        n = len(group)
+        is_open_mkt = group["is_open_market"].astype(bool).values
+        directions = pd.to_numeric(
+            group.get("trade_direction", pd.Series(0, index=group.index)),
+            errors="coerce",
+        ).fillna(0).astype(int).values
+        values = pd.to_numeric(
+            group.get("total_value", pd.Series(np.nan, index=group.index)),
+            errors="coerce",
+        ).values
+        orig_indices = group[original_index_col].values
+
+        for i in range(n):
+            if i == 0:
+                # No history yet — first trade for this insider
+                records.append({
+                    "orig_idx": orig_indices[i],
+                    "insider_total_trades": 0,
+                    "insider_avg_trade_value": 0.0,
+                    "insider_buy_sell_ratio": 0.5,  # neutral prior
+                    "insider_tenure_days": 0,
+                    "insider_buy_count": 0,
+                    "insider_sell_count": 0,
+                })
+                continue
+
+            # Past trades: indices 0..i-1
+            past_om_mask = is_open_mkt[:i]
+            past_directions = directions[:i]
+            past_values = values[:i]
+
+            total_trades = i  # all past trades for this insider
+
+            buy_count = int(np.sum((past_om_mask) & (past_directions == 1)))
+            sell_count = int(np.sum((past_om_mask) & (past_directions == -1)))
+            denom = buy_count + sell_count
+            buy_sell_ratio = buy_count / denom if denom > 0 else 0.5
+
+            valid_vals = past_values[
+                ~np.isnan(past_values) & (past_values > 0)
+            ]
+            avg_trade_value = float(np.mean(valid_vals)) if len(valid_vals) > 0 else 0.0
+
+            first_date = group["transaction_date"].iloc[0]
+            current_date = group["transaction_date"].iloc[i]
+            tenure_days = int((current_date - first_date).days)
+
+            records.append({
+                "orig_idx": orig_indices[i],
+                "insider_total_trades": total_trades,
+                "insider_avg_trade_value": avg_trade_value,
+                "insider_buy_sell_ratio": buy_sell_ratio,
+                "insider_tenure_days": tenure_days,
+                "insider_buy_count": buy_count,
+                "insider_sell_count": sell_count,
+            })
+
+    result_df = pd.DataFrame(records).set_index("orig_idx")
+    return result_df
 
 
 def build(df: pd.DataFrame) -> pd.DataFrame:
-    """Apply role features and join per-insider aggregates onto the frame."""
+    """Apply role features and join per-insider rolling aggregates onto the frame."""
     df = add_role_features(df)
 
-    agg = _compute_insider_aggregates(df)
-    agg = agg.rename(columns={
-        "total_trades_hist": "insider_total_trades",
-        "avg_trade_value_hist": "insider_avg_trade_value",
-        "buy_sell_ratio_hist": "insider_buy_sell_ratio",
-        "tenure_days_hist": "insider_tenure_days",
-        "buy_count": "insider_buy_count",
-        "sell_count": "insider_sell_count",
-    })
+    print("  Computing rolling insider aggregates (look-ahead-free)...")
+    agg = _compute_insider_aggregates_rolling(df)
 
     cols = [
-        "insider_cik",
         "insider_total_trades",
         "insider_avg_trade_value",
         "insider_buy_sell_ratio",
@@ -124,5 +171,16 @@ def build(df: pd.DataFrame) -> pd.DataFrame:
         "insider_buy_count",
         "insider_sell_count",
     ]
-    df = df.merge(agg[cols], on="insider_cik", how="left")
+
+    # Join back on original index
+    df = df.join(agg[cols])
+
+    # Fill any insiders that had no history at all (shouldn't happen but safe)
+    df["insider_total_trades"] = df["insider_total_trades"].fillna(0).astype(int)
+    df["insider_avg_trade_value"] = df["insider_avg_trade_value"].fillna(0.0)
+    df["insider_buy_sell_ratio"] = df["insider_buy_sell_ratio"].fillna(0.5)
+    df["insider_tenure_days"] = df["insider_tenure_days"].fillna(0).astype(int)
+    df["insider_buy_count"] = df["insider_buy_count"].fillna(0).astype(int)
+    df["insider_sell_count"] = df["insider_sell_count"].fillna(0).astype(int)
+
     return df
