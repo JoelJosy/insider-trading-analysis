@@ -1,0 +1,159 @@
+{
+  "baseline_auc_pr": 0.665,
+  "xgb_params": {
+    "objective": "binary:logistic",
+    "max_depth": 7,
+    "learning_rate": 0.1,
+    "n_estimators": 100,
+    "subsample": 1.0,
+    "colsample_bytree": 1.0,
+    "reg_lambda": 1.0,
+    "scale_pos_weight": 1.4436,
+    "random_state": 42,
+    "tree_method": "hist",
+    "eval_metric": "logloss",
+    "early_stopping_rounds": 20,
+    "n_jobs": -1
+  },
+  "ablation_results": [
+    {
+      "group": "insider_profile",
+      "removed_features": [
+        "role_seniority",
+        "is_ceo",
+        "is_cfo",
+        "is_coo",
+        "is_director_only",
+        "insider_total_trades",
+        "insider_avg_trade_value",
+        "insider_buy_sell_ratio",
+        "insider_tenure_days"
+      ],
+      "features_left": 34,
+      "auc_pr": 0.4458788936712528,
+      "f1": 0.40714582467802246,
+      "precision": 0.3293010752688172,
+      "recall": 0.5331882480957563,
+      "auc_pr_drop": 0.21912110632874726
+    },
+    {
+      "group": "text",
+      "removed_features": [
+        "footnote_length"
+      ],
+      "features_left": 42,
+      "auc_pr": 0.6570095046802265,
+      "f1": 0.5135313531353135,
+      "precision": 0.6526845637583892,
+      "recall": 0.4232861806311208,
+      "auc_pr_drop": 0.007990495319773583
+    },
+    {
+      "group": "market_context",
+      "removed_features": [
+        "is_open_market",
+        "is_derivative",
+        "total_value_is_imputed"
+      ],
+      "features_left": 40,
+      "auc_pr": 0.6649550488170206,
+      "f1": 0.6113924050632912,
+      "precision": 0.7307110438729199,
+      "recall": 0.5255712731229597,
+      "auc_pr_drop": 4.4951182979424686e-05
+    },
+    {
+      "group": "network",
+      "removed_features": [
+        "other_insiders_72h",
+        "same_dir_insiders_72h",
+        "coordination_score",
+        "cluster_flag"
+      ],
+      "features_left": 39,
+      "auc_pr": 0.689653984420446,
+      "f1": 0.6481823783117683,
+      "precision": 0.7471590909090909,
+      "recall": 0.5723612622415669,
+      "auc_pr_drop": -0.024653984420445973
+    },
+    {
+      "group": "trade",
+      "removed_features": [
+        "log_shares",
+        "log_total_value",
+        "log_shares_owned_after",
+        "total_value_is_imputed",
+        "signed_value",
+        "pct_position_traded",
+        "value_bucket_num",
+        "trade_direction"
+      ],
+      "features_left": 35,
+      "auc_pr": 0.7334479318404837,
+      "f1": 0.6748681898066784,
+      "precision": 0.7309644670050761,
+      "recall": 0.6267682263329706,
+      "auc_pr_drop": -0.0684479318404837
+    },
+    {
+      "group": "temporal",
+      "removed_features": [
+        "trades_7d",
+        "trades_30d",
+        "trades_90d",
+        "buy_count_7d",
+        "sell_count_7d",
+        "buy_count_30d",
+        "sell_count_30d",
+        "buy_count_90d",
+        "sell_count_90d",
+        "net_value_7d",
+        "net_value_30d",
+        "net_value_90d",
+        "days_since_last_trade",
+        "consecutive_direction",
+        "trade_frequency_90d"
+      ],
+      "features_left": 28,
+      "auc_pr": 0.7409288847496716,
+      "f1": 0.6971294669009959,
+      "precision": 0.7550761421319797,
+      "recall": 0.6474428726877041,
+      "auc_pr_drop": -0.07592888474967152
+    },
+    {
+      "group": "timing",
+      "removed_features": [
+        "txn_day_of_week",
+        "txn_month",
+        "txn_quarter",
+        "days_to_filing"
+      ],
+      "features_left": 39,
+      "auc_pr": 0.7665077520947274,
+      "f1": 0.7085365853658536,
+      "precision": 0.8058252427184466,
+      "recall": 0.6322089227421109,
+      "auc_pr_drop": -0.1015077520947274
+    }
+  ],
+  "trade_only_baseline": {
+    "features_used": [
+      "log_shares",
+      "log_total_value",
+      "log_shares_owned_after",
+      "total_value_is_imputed",
+      "signed_value",
+      "pct_position_traded",
+      "value_bucket_num",
+      "trade_direction"
+    ],
+    "features_count": 8,
+    "auc_pr": 0.633959439615871,
+    "f1": 0.596699111299196,
+    "precision": 0.48822714681440443,
+    "recall": 0.7671381936887922,
+    "auc_pr_drop": 0.031040560384129057
+  }
+}

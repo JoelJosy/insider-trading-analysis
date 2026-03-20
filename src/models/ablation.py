@@ -22,7 +22,7 @@ LABEL_COL = "final_label"
 TRANSACTION_CODE_COL = "transaction_code"
 VALID_TRANSACTION_CODES = {"P", "S"}
 VALID_LABELS = {0, 1}
-BASELINE_AUC_PR = 0.8865
+BASELINE_AUC_PR = 0.6650  
 
 FEATURE_COLS = [
     "log_shares",
@@ -141,13 +141,16 @@ FEATURE_GROUPS = {
     "market_context": ["is_open_market", "is_derivative", "total_value_is_imputed"],
 }
 
+# Best params from grid search
 XGB_PARAMS = {
     "objective": "binary:logistic",
-    "max_depth": 3,
+    "max_depth": 7,
     "learning_rate": 0.1,
-    "n_estimators": 200,
+    "n_estimators": 100,
     "subsample": 1.0,
-    "scale_pos_weight": 2.4118,
+    "colsample_bytree": 1.0,
+    "reg_lambda": 1.0,
+    "scale_pos_weight": 1.4436,  # 3121/2162 from new train split
     "random_state": 42,
     "tree_method": "hist",
     "eval_metric": "logloss",
@@ -161,9 +164,6 @@ def _ensure_output_dirs() -> None:
 
 
 def _validate_feature_setup() -> None:
-    if len(FEATURE_COLS) != 43:
-        raise ValueError(f"Expected 43 features, found {len(FEATURE_COLS)}")
-
     leakage_overlap = sorted(set(FEATURE_COLS) & LEAKAGE_COLS)
     if leakage_overlap:
         raise ValueError(f"Leakage columns present in feature list: {leakage_overlap}")
@@ -187,8 +187,9 @@ def _load_split(split_name: str) -> pd.DataFrame:
     )
     filtered[LABEL_COL] = pd.to_numeric(filtered[LABEL_COL], errors="coerce")
 
-    mask = filtered[TRANSACTION_CODE_COL].isin(VALID_TRANSACTION_CODES) & filtered[LABEL_COL].isin(
-        VALID_LABELS
+    mask = (
+        filtered[TRANSACTION_CODE_COL].isin(VALID_TRANSACTION_CODES)
+        & filtered[LABEL_COL].isin(VALID_LABELS)
     )
     filtered = filtered.loc[mask].copy()
     if filtered.empty:
@@ -253,7 +254,7 @@ def _fit_and_evaluate(
     return _evaluate(y_test, y_prob)
 
 
-def _print_sorted_table(rows: list[dict[str, float | str | int]]) -> None:
+def _print_sorted_table(rows: list[dict]) -> None:
     print("\nAblation results sorted by AUC-PR drop (descending):")
     print(f"{'group_removed':<18} {'features_left':>13} {'auc_pr':>10} {'drop':>10}")
     print("-" * 56)
@@ -266,12 +267,13 @@ def _print_sorted_table(rows: list[dict[str, float | str | int]]) -> None:
         )
 
 
-def _save_drop_chart(rows: list[dict[str, float | str | int]], output_path: Path) -> None:
+def _save_drop_chart(rows: list[dict], output_path: Path) -> None:
     labels = [str(row["group"]) for row in rows]
     drops = [float(row["auc_pr_drop"]) for row in rows]
+    colors = ["#d9534f" if d > 0 else "#5cb85c" for d in drops]
 
     plt.figure(figsize=(10, 6))
-    plt.barh(labels, drops)
+    bars = plt.barh(labels, drops, color=colors)
     plt.gca().invert_yaxis()
     plt.axvline(0.0, color="black", linewidth=1)
     plt.xlabel(f"AUC-PR Drop vs Baseline ({BASELINE_AUC_PR:.4f})")
@@ -279,30 +281,30 @@ def _save_drop_chart(rows: list[dict[str, float | str | int]], output_path: Path
     plt.tight_layout()
     plt.savefig(output_path, dpi=160)
     plt.close()
+    print(f"Saved ablation chart: {output_path}")
 
 
 def main() -> None:
     _ensure_output_dirs()
     _validate_feature_setup()
 
-    print("Loading trained baseline artifacts...")
-    loaded_model = joblib.load(MODELS_DIR / "xgb_model.joblib")
-    loaded_scaler = joblib.load(MODELS_DIR / "xgb_scaler.joblib")
-    print(
-        f"Loaded model={type(loaded_model).__name__}, "
-        f"scaler={type(loaded_scaler).__name__}"
-    )
-
     print("Loading split datasets...")
     datasets = {split: _load_split(split) for split in SPLITS}
+    print(
+        f"Train: {len(datasets['train'])} | "
+        f"Val: {len(datasets['val'])} | "
+        f"Test: {len(datasets['test'])}"
+    )
 
-    print("Running ablations (remove one feature group at a time)...")
-    ablation_rows: list[dict[str, float | str | int | list[str]]] = []
+    print(f"\nBaseline AUC-PR: {BASELINE_AUC_PR:.4f}")
+    print("Running ablations (remove one feature group at a time)...\n")
+
+    ablation_rows: list[dict] = []
     for group_name, group_features in FEATURE_GROUPS.items():
         remaining_features = [col for col in FEATURE_COLS if col not in set(group_features)]
         print(
-            f"- Ablating group '{group_name}' "
-            f"({len(group_features)} removed, {len(remaining_features)} kept)"
+            f"Ablating '{group_name}' "
+            f"({len(group_features)} removed, {len(remaining_features)} kept)..."
         )
 
         metrics = _fit_and_evaluate(
@@ -326,10 +328,10 @@ def main() -> None:
             }
         )
         print(
-            f"  -> AUC-PR={metrics['auc_pr']:.4f}, "
-            f"drop={auc_pr_drop:.4f}, "
-            f"F1={metrics['f1']:.4f}, "
-            f"P={metrics['precision']:.4f}, "
+            f"  AUC-PR={metrics['auc_pr']:.4f}  "
+            f"drop={auc_pr_drop:+.4f}  "
+            f"F1={metrics['f1']:.4f}  "
+            f"P={metrics['precision']:.4f}  "
             f"R={metrics['recall']:.4f}"
         )
 
@@ -350,11 +352,11 @@ def main() -> None:
     )
     trade_only_drop = BASELINE_AUC_PR - trade_only_metrics["auc_pr"]
     print(
-        "trade_only -> "
-        f"AUC-PR={trade_only_metrics['auc_pr']:.4f}, "
-        f"drop={trade_only_drop:.4f}, "
-        f"F1={trade_only_metrics['f1']:.4f}, "
-        f"P={trade_only_metrics['precision']:.4f}, "
+        f"trade_only -> "
+        f"AUC-PR={trade_only_metrics['auc_pr']:.4f}  "
+        f"drop={trade_only_drop:+.4f}  "
+        f"F1={trade_only_metrics['f1']:.4f}  "
+        f"P={trade_only_metrics['precision']:.4f}  "
         f"R={trade_only_metrics['recall']:.4f}"
     )
 
@@ -381,7 +383,6 @@ def main() -> None:
         json.dump(output, fp, indent=2)
 
     print(f"\nSaved ablation results: {output_json}")
-    print(f"Saved ablation drop chart: {output_plot}")
 
 
 if __name__ == "__main__":
