@@ -129,8 +129,8 @@ def run_cross_validation() -> None:
 
         params = {
             "max_depth": 7,
-            "learning_rate": 0.1,
-            "subsample": 1.0,
+            "learning_rate": 0.05,
+            "subsample": 0.8,
             "colsample_bytree": 1.0,
             "reg_lambda": 1.0,
             "seed": 42,  # XGBoost uses seed, not random_state

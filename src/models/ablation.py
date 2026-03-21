@@ -22,7 +22,7 @@ LABEL_COL = "final_label"
 TRANSACTION_CODE_COL = "transaction_code"
 VALID_TRANSACTION_CODES = {"P", "S"}
 VALID_LABELS = {0, 1}
-BASELINE_AUC_PR = 0.6650  
+BASELINE_AUC_PR = 0.6900  
 
 FEATURE_COLS = [
     "log_shares",
@@ -145,12 +145,12 @@ FEATURE_GROUPS = {
 XGB_PARAMS = {
     "objective": "binary:logistic",
     "max_depth": 7,
-    "learning_rate": 0.1,
+    "learning_rate": 0.05,  # changed from 0.1
     "n_estimators": 100,
-    "subsample": 1.0,
+    "subsample": 0.8,       # changed from 1.0
     "colsample_bytree": 1.0,
     "reg_lambda": 1.0,
-    "scale_pos_weight": 1.4436,  # 3121/2162 from new train split
+    "scale_pos_weight": 1.6487,  # 6410/3888 from expanded train
     "random_state": 42,
     "tree_method": "hist",
     "eval_metric": "logloss",
