@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-03-21T05:22:35.445119",
+  "input_csv": "data/processed/UPS_form4_features.csv",
+  "params": {
+    "horizon_days": 30,
+    "benchmark_ticker": "SPY",
+    "abnormal_threshold": 0.05,
+    "confidence_sources_required": 2,
+    "earnings_proximity_days": 30,
+    "earnings_csv": "data/external/earnings/earnings_announcements.csv",
+    "enforcement_csv": "data/external/sec/sec_enforcement.csv",
+    "enforcement_lookahead_days": 365
+  },
+  "rows": 489,
+  "coverage": {
+    "forward_return_rows": 489,
+    "forward_return_pct": 100.0,
+    "benchmark_return_rows": 489,
+    "benchmark_return_pct": 100.0
+  },
+  "labels": {
+    "opportunistic_rows": 21,
+    "opportunistic_pct": 4.29,
+    "routine_rows": 11,
+    "routine_pct": 2.25,
+    "uncertain_rows": 457,
+    "uncertain_pct": 93.46
+  },
+  "signals": {
+    "price_signal_rows": 60,
+    "earnings_signal_rows": 474,
+    "enforcement_signal_rows": 0,
+    "label_source_count_distribution": {
+      "0": 12,
+      "1": 420,
+      "2": 57
+    }
+  },
+  "recommendations": [
+    "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
+  ]
+}

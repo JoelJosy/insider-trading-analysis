@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-03-21T05:18:32.998771",
+  "input_csv": "data/processed/QCOM_form4_features.csv",
+  "params": {
+    "horizon_days": 30,
+    "benchmark_ticker": "SPY",
+    "abnormal_threshold": 0.05,
+    "confidence_sources_required": 2,
+    "earnings_proximity_days": 30,
+    "earnings_csv": "data/external/earnings/earnings_announcements.csv",
+    "enforcement_csv": "data/external/sec/sec_enforcement.csv",
+    "enforcement_lookahead_days": 365
+  },
+  "rows": 707,
+  "coverage": {
+    "forward_return_rows": 707,
+    "forward_return_pct": 100.0,
+    "benchmark_return_rows": 707,
+    "benchmark_return_pct": 100.0
+  },
+  "labels": {
+    "opportunistic_rows": 11,
+    "opportunistic_pct": 1.56,
+    "routine_rows": 186,
+    "routine_pct": 26.31,
+    "uncertain_rows": 510,
+    "uncertain_pct": 72.14
+  },
+  "signals": {
+    "price_signal_rows": 126,
+    "earnings_signal_rows": 297,
+    "enforcement_signal_rows": 0,
+    "label_source_count_distribution": {
+      "0": 362,
+      "1": 267,
+      "2": 78
+    }
+  },
+  "recommendations": [
+    "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-03-20T22:16:27.970358",
+  "input_csv": "data/processed/NKE_form4_features.csv",
+  "params": {
+    "horizon_days": 30,
+    "benchmark_ticker": "SPY",
+    "abnormal_threshold": 0.05,
+    "confidence_sources_required": 2,
+    "earnings_proximity_days": 30,
+    "earnings_csv": "data/external/earnings/earnings_announcements.csv",
+    "enforcement_csv": "data/external/sec/sec_enforcement.csv",
+    "enforcement_lookahead_days": 365
+  },
+  "rows": 872,
+  "coverage": {
+    "forward_return_rows": 872,
+    "forward_return_pct": 100.0,
+    "benchmark_return_rows": 872,
+    "benchmark_return_pct": 100.0
+  },
+  "labels": {
+    "opportunistic_rows": 0,
+    "opportunistic_pct": 0.0,
+    "routine_rows": 215,
+    "routine_pct": 24.66,
+    "uncertain_rows": 657,
+    "uncertain_pct": 75.34
+  },
+  "signals": {
+    "price_signal_rows": 170,
+    "earnings_signal_rows": 714,
+    "enforcement_signal_rows": 0,
+    "label_source_count_distribution": {
+      "0": 106,
+      "1": 648,
+      "2": 118
+    }
+  },
+  "recommendations": [
+    "Opportunistic share is very low (<1%); review Cohen/plan rules for over-conservative labeling.",
+    "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
+  ]
+}

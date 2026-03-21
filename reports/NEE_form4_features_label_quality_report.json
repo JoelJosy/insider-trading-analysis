@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-03-20T22:16:12.756748",
+  "input_csv": "data/processed/NEE_form4_features.csv",
+  "params": {
+    "horizon_days": 30,
+    "benchmark_ticker": "SPY",
+    "abnormal_threshold": 0.05,
+    "confidence_sources_required": 2,
+    "earnings_proximity_days": 30,
+    "earnings_csv": "data/external/earnings/earnings_announcements.csv",
+    "enforcement_csv": "data/external/sec/sec_enforcement.csv",
+    "enforcement_lookahead_days": 365
+  },
+  "rows": 477,
+  "coverage": {
+    "forward_return_rows": 475,
+    "forward_return_pct": 99.58,
+    "benchmark_return_rows": 477,
+    "benchmark_return_pct": 100.0
+  },
+  "labels": {
+    "opportunistic_rows": 20,
+    "opportunistic_pct": 4.19,
+    "routine_rows": 33,
+    "routine_pct": 6.92,
+    "uncertain_rows": 424,
+    "uncertain_pct": 88.89
+  },
+  "signals": {
+    "price_signal_rows": 131,
+    "earnings_signal_rows": 389,
+    "enforcement_signal_rows": 0,
+    "label_source_count_distribution": {
+      "0": 81,
+      "1": 272,
+      "2": 124
+    }
+  },
+  "recommendations": [
+    "No enforcement confirmations found; provide SEC enforcement CSV for higher-confidence labels."
+  ]
+}
