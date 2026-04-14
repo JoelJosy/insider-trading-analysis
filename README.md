@@ -1,74 +1,112 @@
-# Insider Trading Analysis
+#  SEC Form 4 Insider Trading Analysis
 
-Machine learning pipeline for SEC Form 4 insider-trading analysis, from raw filings to labeled datasets and multi-model evaluation.
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
+![Machine Learning](https://img.shields.io/badge/Machine%20Learning-XGBoost%20%7C%20Scikit--Learn-orange)
+![Data Engineering](https://img.shields.io/badge/Data%20Engineering-SEC%20EDGAR%20%7C%20PostgreSQL-green)
+![Data Science](https://img.shields.io/badge/Data%20Science-SHAP%20%7C%20Apriori%20%7C%20K--Means-purple)
 
-## Project Status
+> An end-to-end Machine Learning pipeline designed to extract, engineer, and analyze SEC Form 4 filings to detect anomalous patterns and potential illegal insider trading activities. 
 
-Implemented and used in this repo:
+##  Mission Statement
 
-- SEC Form 4 extraction and parsing
-- Feature engineering pipeline (trade, insider, temporal, network, text)
-- Phase 3 behavioral labeling (Cohen pattern + 10b5-1 override)
-- External confirmation data ingestion (earnings + SEC enforcement)
-- Time-based train/val/test split generation
-- Multiple model tracks:
-  - XGBoost + SHAP
-  - Naive Bayes
-  - Isolation Forest
-  - K-means
-  - Fuzzy scoring
-  - Apriori association rules
-- Validation and analysis utilities (cross-validation, ablation, post-hoc checks)
+This repository houses a comprehensive data engineering and machine learning architecture that transforms complex, unstructured SEC Form 4 filings into powerful behavioral insights. By combining supervised anomaly classification (XGBoost, Naive Bayes), unsupervised clustering (K-Means, Isolation Forest), and rule-based association (Apriori), this system identifies structural data asymmetries and flags suspicious executive trading patterns.
 
-## Repository Layout
+**Developed By:** 
+* Naman Alex Xavier - [namanalex@gmail.com](mailto:namanalex@gmail.com)
+* Joel Josy - [joeljosy79@gmail.com](mailto:joeljosy79@gmail.com)
 
+---
+
+## Key Innovations & Features
+
+- **Automated SEC EDGAR Ingestion:** Robust extraction pipeline for Form 4 XML filings, handling rate-limiting and complex financial data schemas.
+- **Multidimensional Feature Engineering:** Constructs temporal, network, textual, and trading-based features (e.g., Cohen patterns, 10b5-1 plan overrides).
+- **External Data Fusion:** Integrates market pricing context (Yahoo Finance) and external ground-truth events (SEC enforcement actions, Earnings declarations) for precise time-horizon labeling.
+- **Multi-Model Evaluation Track:**
+  - *Supervised Learning:* XGBoost (with SHAP interpretability) & Naive Bayes.
+  - *Unsupervised/Anomaly Detection:* Isolation Forest & K-Means for structural clustering.
+  - *Pattern Mining:* Fuzzy scoring & Apriori association rules.
+- **Explainable AI (XAI):** Built-in SHAP visualizations and post-hoc validation utilities to interpret model decisions, moving beyond "black-box" predictions.
+- **Scalable Architecture:** Capable of handling multi-ticker batch runs, backed by an optional PostgreSQL relational schema for large-scale analytics.
+
+---
+
+## Architectural Workflow
+
+```mermaid
+graph TD;
+    A[SEC EDGAR Form 4] -->|Extraction Phase| B(Raw XML/CSVs)
+    B -->|Parsing & Structuring| C(Quality Validated Data)
+    M[Market Prices] --> C
+    E[Earnings & Enforcements] --> D
+    C -->|Feature Engineering Phase| D(Engineered Features)
+    D -->|Labeling Phase| F(Labeled Time-Series Splits)
+    F -->|Supervised Training| G(XGBoost / Naive Bayes)
+    F -->|Unsupervised / Rule| H(K-Means / I-Forest / Apriori)
+    G --> I[SHAP Explanations & Reports]
+    H --> I
+    
+    classDef primary fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px;
+    classDef secondary fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+    class A,M,E primary;
+    class I secondary;
 ```
+
+---
+
+## Technology Stack
+
+- **Core & Data Processing:** Python 3.11+, Pandas, NumPy
+- **Machine Learning & NLP:** Scikit-Learn, XGBoost, SpaCy, NLTK, TextBlob
+- **Model Explainability:** SHAP, LIME
+- **Data Acquisition:** sec-edgar-downloader, yfinance, BeautifulSoup4, LXML
+- **Database Architecture:** PostgreSQL, SQLAlchemy, Psycopg2
+- **Visualization:** Plotly, Matplotlib, Seaborn
+- **Testing & Tooling:** PyTest, PyYAML, Python-Dotenv, tqdm
+
+---
+
+## Repository Structure
+
+```text
 insider-trading-analysis/
-├── config/
-│   └── config.yaml
+├── config/             # YAML configurations (tickers, parameters)
 ├── data/
-│   ├── raw/                        # SEC filing downloads
-│   ├── external/
-│   │   ├── earnings/
-│   │   ├── prices/
-│   │   └── sec/
-│   └── processed/                  # Parsed, feature, labeled, and split CSVs
-├── logs/
-├── models/                         # Saved model/scaler artifacts (.joblib)
-├── reports/
-│   ├── dataset/
-│   └── model/
-├── scripts/
-│   ├── run_pipeline.sh
-│   ├── create_splits.py
-│   ├── download_prices.py
-│   └── test.py
-├── sql/
-│   └── schema.sql
-├── src/
-│   ├── data/
-│   ├── features/
-│   ├── labels/
-│   ├── models/
-│   └── utils/
-├── requirements.txt
-├── requirements-lock.txt
-└── README.md
+│   ├── raw/            # Downloaded SEC XML filings
+│   ├── processed/      # Engineered and labeled data splits
+│   └── external/       # Market pricing and SEC enforcement data
+├── models/             # Serialized joblib artifacts (models/scalers)
+├── reports/            # Auto-generated JSON/MD validation & metrics
+├── scripts/            # Bash & Python orchestration entrypoints
+├── sql/                # DB relational schemas
+└── src/
+    ├── data/           # Extraction, market data, external events
+    ├── features/       # Temporal, text, network feature generation
+    ├── labels/         # Cohen heuristic & 10b5-1 labeling logic
+    ├── models/         # Multi-model core architectures (XGB, Apriori, etc.)
+    └── utils/          # Project-wide loggers and cross-validation utilities
 ```
 
-## Setup
+---
 
-1. Create and activate a Python environment (3.11/3.12 recommended).
+## Setup & Installation
 
-2. Install dependencies:
+**1. Clone the repository and initialize the Python environment (3.11/3.12 recommended):**
+```bash
+git clone https://github.com/your-username/insider-trading-analysis.git
+cd insider-trading-analysis
+python -m venv .venv
+source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
+```
 
+**2. Install project dependencies:**
 ```bash
 pip install --upgrade pip
 pip install -r requirements-lock.txt
 ```
 
-3. Configure environment variables in .env (for database use):
-
+**3. Configure environment variables:**
+Create a `.env` file in the root directory for your database configuration (if opting to use PostgreSQL):
 ```env
 DB_HOST=localhost
 DB_PORT=5432
@@ -77,229 +115,80 @@ DB_USER=postgres
 DB_PASSWORD=your_password
 ```
 
-4. Review config/config.yaml for ticker groups, SEC settings, and labeling parameters.
+---
 
-## End-to-End Pipeline
+## End-to-End Execution
 
-Run from project root with the environment activated.
+The pipeline is heavily modular. You can orchestrate multi-ticker runs universally or process specific tickers stepwise.
 
-### 1) Extract SEC filings
-
-```bash
-python -m src.data.extract --ticker AAPL --num-filings 500
-```
-
-Useful flags:
-
-- --skip-market-prices: skip price enrichment at extraction time
-- --refresh: force SEC re-download
-
-Outputs:
-
-- data/raw/sec-edgar-filings/<TICKER>/4/... (raw filing files)
-- data/processed/<TICKER>\_form4.csv
-- logs/extract.log, logs/parser.log, logs/downloader.log
-
-### 2) Data quality report (optional)
-
-```bash
-python -m src.data.quality --csv data/processed/AAPL_form4.csv
-```
-
-Outputs:
-
-- reports/AAPL_form4_quality_report.json
-- reports/AAPL_form4_quality_report.md
-- logs/quality.log
-
-### 3) Feature engineering
-
-```bash
-python -m src.features.pipeline --input data/processed/AAPL_form4.csv
-```
-
-Useful flags:
-
-- --skip-preflight
-- --full
-- --output <custom_path>
-
-Output:
-
-- data/processed/AAPL_form4_features.csv
-
-### 4) External events (earnings + enforcement)
-
-```bash
-python -m src.data.external_events --tickers AAPL
-```
-
-Useful options:
-
-- --earnings-source auto|sec|yfinance
-- --skip-earnings
-- --skip-enforcement
-- --include-yf-aliases
-
-Outputs:
-
-- data/external/earnings/earnings_announcements.csv
-- data/external/sec/sec_enforcement.csv
-- logs/external_events.log
-
-### 5) Labeling (Phase 3)
-
-```bash
-python -m src.labels.pipeline --input data/processed/AAPL_form4_features.csv
-```
-
-Useful options:
-
-- --output data/processed/AAPL_form4_features_labeled.csv
-- --benchmark SPY
-- --horizon-days 30
-- --focus-ticker AAPL
-- --allow-missing-prices (debug only)
-
-Outputs:
-
-- data/processed/\*\_labeled.csv
-- reports/\*\_label_quality_report.json
-- reports/\*\_label_quality_report.md
-- logs/labels.log
-
-### 6) Build modeling splits
-
-```bash
-python scripts/create_splits.py
-```
-
-This reads data/processed/\*\_form4_features_labeled.csv and writes:
-
-- data/processed/master_labeled.csv
-- data/processed/train.csv
-- data/processed/val.csv
-- data/processed/test.csv
-
-## Batch Run Script
-
-For multi-ticker pipeline runs, use:
-
+### Batch Orchestration
+For the fastest way to run the entire pipeline across configured tickers:
 ```bash
 bash scripts/run_pipeline.sh
 ```
 
-Current script flow per ticker:
-
-1. src.data.extract (with --skip-market-prices)
-2. src.features.pipeline (with --skip-preflight)
-3. src.data.external_events (earnings only in current script config)
-4. src.labels.pipeline
-
-Note: because extraction is currently called with --skip-market-prices in this script, ensure price cache files exist in data/external/prices for labeling.
-
-## Price Cache Utility
-
-Populate or refresh cached daily prices:
-
+### Step-by-Step Analysis (Example: AAPL)
+**1. Extract SEC Filings**
+Extract raw Data from SEC EDGAR.
 ```bash
-python scripts/download_prices.py --tickers SPY AAPL
+python -m src.data.extract --ticker AAPL --num-filings 500
+```
+**2. Data Quality Profiling**
+Generates `.json` and `.md` reports ensuring schema integrity.
+```bash
+python -m src.data.quality --csv data/processed/AAPL_form4.csv
+```
+**3. Feature Engineering**
+Generates core technical, chronological, and text-sentiment features.
+```bash
+python -m src.feature.pipeline --input data/processed/AAPL_form4.csv
+```
+**4. External Events Ingestion**
+Fetch critical timeline hooks like earnings schedules and enforcement flags.
+```bash
+python -m src.data.external_events --tickers AAPL
+```
+**5. Phase 3 Labeling**
+Label historical entries utilizing custom Cohen heuristics & SEC plan overrides.
+```bash
+python -m src.labels.pipeline --input data/processed/AAPL_form4_features.csv
+```
+**6. Data Splitting**
+Merge multi-ticker processed data and allocate time-based train/validation/test sets.
+```bash
+python scripts/create_splits.py
 ```
 
-Defaults to Stooq provider and writes:
+---
 
-- data/external/prices/<TICKER>\_daily_prices.csv
+## Model Training & Validation
 
-## Model Training
+Once split arrays reside in `data/processed/`, core learning endpoints evaluate predictive accuracy against standard and anomaly horizons.
 
-All model modules assume split files exist:
-
-- data/processed/train.csv
-- data/processed/val.csv
-- data/processed/test.csv
-
-### Core supervised/anomaly models
-
+**Train Models:**
 ```bash
-python -m src.models.naive_bayes_model
-python -m src.models.isolation_forest_model
+# Supervised Classification
 python -m src.models.xgb_model
+python -m src.models.naive_bayes_model
+
+# Anomaly Detection & Clustering
+python -m src.models.isolation_forest_model
 python -m src.models.kmeans_model
+
+# Scoring & Rule Inference
 python -m src.models.fuzzy_model
 python -m src.models.apriori_model
 ```
 
-### Validation and analysis modules
-
+**Analysis & Post-hoc Explanability Validation:**
+Unveil critical model logic and visualize feature importance across distinct stock sectors:
 ```bash
 python -m src.models.cross_validate
 python -m src.models.ablation
 python -m src.models.posthoc_validation
+python -m src.models.sector_analysis
 ```
 
-Additional analysis scripts in src/models:
+Models output trained serialized artifacts to `models/` and robust metric reports (`.json`) alongside `.png` graphs (like SHAP beeswarm or Apriori ROCs) internally to the `reports/` directory.
 
-- ensemble_analysis.py
-- sector_analysis.py
-- posthoc_by_sector.py
-
-## Typical Output Artifacts
-
-Model artifacts in models/:
-
-- xgb_model.joblib, xgb_scaler.joblib
-- naive_bayes_model.joblib, naive_bayes_scaler.joblib
-- isolation_forest_model.joblib, isolation_forest_scaler.joblib
-- kmeans_model.joblib, kmeans_scaler.joblib
-- fuzzy_model.joblib
-- apriori_model.joblib
-
-Report artifacts in reports/ (examples):
-
-- model_results_xgb.json
-- model_results_naive_bayes.json
-- model_results_isolation_forest.json
-- model_results_kmeans.json
-- model_results_fuzzy.json
-- model_results_apriori.json
-- shap_xgb.png, shap_xgb_beeswarm.png
-- nb_pr_curve.png, nb_feature_separation.png
-- iforest_score_distribution.png, iforest_feature_importance.png
-- fuzzy_score_distribution.png
-- apriori_rules.csv
-- cross_validation_results.json
-- ablation_results.json, ablation_auc_pr_drop.png
-- posthoc_validation.json, posthoc_boxplot.png, posthoc_histogram.png
-
-## Optional Database Flow
-
-Database is optional for feature/label/model workflows, but supported.
-
-Initialize schema:
-
-```bash
-python -m src.data.load --init-schema
-```
-
-Load parsed CSV:
-
-```bash
-python -m src.data.load --load-csv data/processed/AAPL_form4.csv
-```
-
-Maintenance:
-
-```bash
-python -m src.data.load --update-stats
-python -m src.data.load --refresh-views
-```
-
-## Notes
-
-- Most modeling code filters to open-market transactions (P/S) and final_label in {0,1} for supervised evaluation.
-- Leakage-related columns are explicitly excluded in model feature definitions.
-- If market data is unavailable, labeling will fail fast unless --allow-missing-prices is set.
-
-## License
-
-Academic/research use.
+---
